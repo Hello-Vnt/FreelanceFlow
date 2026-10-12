@@ -1,0 +1,23 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FreelanceFlow.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n/// @title FreelanceFlow\n/// @notice A freelancer's project board. Each completed milestone is stamped with the block\n///         timestamp, so clients can verify progress. No tokens, no payments, no admin.\ncontract FreelanceFlow {\n    struct Project {\n        address owner;\n        string title;\n        string client;\n        uint64 createdAt;\n        uint8 total;\n        uint8 done;\n    }\n\n    struct Milestone {\n        string title;\n        uint64 dueDate;\n        uint64 completedAt; // 0 while open\n    }\n\n    uint256 public constant MAX_MILESTONES = 10;\n    uint256 public constant MAX_TITLE_LENGTH = 80; // bytes, for project and milestone titles\n    uint256 public constant MAX_CLIENT_LENGTH = 60; // bytes\n\n    Project[] public projects;\n    mapping(uint256 => Milestone[]) internal milestones;\n    mapping(address => uint256[]) private _projectsOf;\n\n    event ProjectCreated(uint256 indexed id, address indexed owner, string title);\n    event MilestoneCompleted(uint256 indexed projectId, uint8 index, uint64 completedAt);\n\n    error InvalidTitle();\n    error InvalidClient();\n    error InvalidMilestones();\n    error InvalidDueDate();\n    error ProjectNotFound();\n    error MilestoneNotFound();\n    error NotOwner();\n    error AlreadyCompleted();\n\n    function createProject(\n        string calldata title,\n        string calldata client,\n        string[] calldata titles,\n        uint64[] calldata dueDates\n    ) external returns (uint256 id) {\n        uint256 count = titles.length;\n        if (count == 0 || count > MAX_MILESTONES || dueDates.length != count) revert InvalidMilestones();\n        if (bytes(title).length == 0 || bytes(title).length > MAX_TITLE_LENGTH) revert InvalidTitle();\n        if (bytes(client).length == 0 || bytes(client).length > MAX_CLIENT_LENGTH) revert InvalidClient();\n\n        id = projects.length;\n        projects.push(Project(msg.sender, title, client, uint64(block.timestamp), uint8(count), 0));\n\n        Milestone[] storage list = milestones[id];\n        for (uint256 i = 0; i < count; i++) {\n            if (bytes(titles[i]).length == 0 || bytes(titles[i]).length > MAX_TITLE_LENGTH) revert InvalidTitle();\n            if (dueDates[i] == 0) revert InvalidDueDate();\n            list.push(Milestone(titles[i], dueDates[i], 0));\n        }\n\n        _projectsOf[msg.sender].push(id);\n        emit ProjectCreated(id, msg.sender, title);\n    }\n\n    function completeMilestone(uint256 projectId, uint8 index) external {\n        if (projectId >= projects.length) revert ProjectNotFound();\n        Project storage project = projects[projectId];\n        if (project.owner != msg.sender) revert NotOwner();\n        if (index >= project.total) revert MilestoneNotFound();\n        Milestone storage milestone = milestones[projectId][index];\n        if (milestone.completedAt != 0) revert AlreadyCompleted();\n\n        uint64 completedAt = uint64(block.timestamp);\n        milestone.completedAt = completedAt;\n        project.done += 1;\n        emit MilestoneCompleted(projectId, index, completedAt);\n    }\n\n    function getProject(uint256 id) external view returns (Project memory, Milestone[] memory) {\n        if (id >= projects.length) revert ProjectNotFound();\n        return (projects[id], milestones[id]);\n    }\n\n    function projectsOf(address owner) external view returns (uint256[] memory) {\n        return _projectsOf[owner];\n    }\n\n    function totalProjects() external view returns (uint256) {\n        return projects.length;\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode.object"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,1618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Freelance Flow — milestones stamped on BOT Chain</title>
+<meta name="description" content="A freelancer's project board where every milestone you complete is stamped on BOT Chain. Share one link so clients can verify your progress.">
+<meta property="og:title" content="Freelance Flow">
+<meta property="og:description" content="Milestones stamped on BOT Chain. One link for clients to verify progress.">
+<meta name="theme-color" content="#5B4CDB">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235B4CDB'/%3E%3Ccircle cx='16' cy='8' r='3.6' fill='%23fff'/%3E%3Crect x='14' y='9' width='4' height='5' fill='%23fff'/%3E%3Crect x='7' y='11.5' width='18' height='13' rx='6' fill='%23fff'/%3E%3Crect x='4.5' y='22.5' width='23' height='5' rx='2.5' fill='%23FFD166'/%3E%3Ccircle cx='12.6' cy='17' r='1.6' fill='%23111827'/%3E%3Ccircle cx='19.4' cy='17' r='1.6' fill='%23111827'/%3E%3Cpath d='M13.6 19.8q2.4 1.8 4.8 0' fill='none' stroke='%23111827' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #FFFFFF; --accent: #5B4CDB; --accent-dark: #4A3CC4; --accent-soft: #EEEBFF;
+    --text: #111827; --muted: #6B7280; --border: #E5E7EB; --surface: #F9FAFB;
+    --success: #16A34A; --success-soft: #E8F6ED; --overdue: #DC2626; --overdue-soft: #FDECEC;
+    --side: 84px; --tabbar: 64px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font: 15px/1.5 Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  h1, h2, h3, p { margin: 0; }
+  [hidden] { display: none !important; }
+  svg.i { flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  svg.i.fill { fill: currentColor; stroke: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- sidebar / bottom tab bar ---------- */
+  .side { position: fixed; inset: 0 auto 0 0; width: var(--side); z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 0; background: var(--bg); border-right: 1px solid var(--border); }
+  .mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; }
+  .side .mark { margin-bottom: 18px; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 68px; padding: 10px 0 8px; border: 0; border-radius: 12px; background: none; color: var(--muted); font-size: 11px; font-weight: 500; text-decoration: none; transition: background .15s, color .15s; }
+  .nav-item:hover { background: var(--surface); color: var(--text); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent); }
+
+  /* ---------- page frame ---------- */
+  .page { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; margin-left: var(--side); }
+  .top { display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-height: 68px; padding: 14px 32px; }
+  .wordmark { display: none; align-items: center; gap: 10px; margin-right: auto; font-weight: 700; font-size: 16px; text-decoration: none; letter-spacing: -.01em; }
+  .wordmark .mark { width: 30px; height: 30px; border-radius: 9px; }
+  .notice { margin: 0 auto 8px; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-size: 12.5px; font-weight: 500; text-align: center; max-width: calc(100% - 32px); }
+  main { flex: 1; width: 100%; max-width: 768px; margin: 0 auto; padding: 8px 24px 72px; }
+
+  body.proof .side { display: none; }
+  body.proof .page { margin-left: 0; }
+  body.proof .wordmark { display: flex; }
+  body.proof .top { max-width: 768px; width: 100%; margin: 0 auto; padding: 14px 24px; }
+
+  /* ---------- buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 10px; background: none; font-size: 14px; font-weight: 600; white-space: nowrap; text-decoration: none; transition: background .15s, border-color .15s, color .15s; }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-dark); }
+  .btn.outline { border-color: var(--border); background: var(--bg); color: var(--text); }
+  .btn.outline:hover { border-color: #C9CDD4; background: var(--surface); }
+  .btn.ghost { padding: 0 10px; color: var(--accent); }
+  .btn.ghost:hover { background: var(--accent-soft); }
+  .btn.warn { border-color: var(--overdue); color: var(--overdue); background: var(--bg); }
+  .btn.warn:hover { background: var(--overdue-soft); }
+  .btn.sm { min-height: 34px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+  .btn:disabled { opacity: .6; cursor: not-allowed; }
+  .btn.busy { opacity: 1; cursor: progress; }
+  .spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 8px; background: none; color: var(--muted); }
+  .icon-btn:hover { background: var(--surface); color: var(--text); }
+  .wallet-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+  .link { color: var(--accent); font-weight: 500; text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+
+  /* ---------- page head, tabs, controls ---------- */
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  h1 { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; }
+  .sub { color: var(--muted); margin-top: 6px; }
+  .tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tab { position: relative; padding: 10px 0 12px; border: 0; background: none; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .tab:hover { color: var(--text); }
+  .tab .count { margin-left: 6px; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .tab.active { color: var(--accent); font-weight: 600; }
+  .tab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+  .search { position: relative; margin-bottom: 12px; }
+  .search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search input, .field input { width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); outline: none; transition: border-color .15s, box-shadow .15s; }
+  .search input { padding-left: 42px; border-radius: 999px; }
+  .search input:focus, .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input::placeholder { color: #9CA3AF; }
+  .controls { display: flex; gap: 8px; margin-bottom: 18px; }
+  .dd { position: relative; }
+  .dd .btn .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .menu { position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; min-width: 200px; margin: 0; padding: 6px; list-style: none; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(17, 24, 39, .1); }
+  .menu button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px; background: none; font-size: 14px; text-align: left; }
+  .menu button:hover { background: var(--surface); }
+  .menu button[aria-checked="true"] { color: var(--accent); font-weight: 600; }
+
+  /* ---------- cards ---------- */
+  .list { display: grid; gap: 12px; }
+  .card { display: block; padding: 20px 22px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+  a.card:hover { border-color: #C7C1F3; box-shadow: 0 2px 10px rgba(91, 76, 219, .08); }
+  .card h3 { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+  .card .client { color: var(--muted); font-size: 14px; margin-top: 2px; overflow-wrap: anywhere; }
+  .progress-line { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .bar { flex: 1; height: 4px; border-radius: 4px; background: var(--border); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 4px; background: var(--accent); transition: width .3s; }
+  .bar.done i { background: var(--success); }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: 13px; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+  .pill.done { background: var(--success-soft); color: var(--success); }
+  .pill.muted { background: var(--surface); color: var(--muted); }
+  a.pill { text-decoration: none; }
+  a.pill:hover { filter: brightness(.96); }
+  .red { color: var(--overdue); font-weight: 500; }
+  .green { color: var(--success); font-weight: 500; }
+  .skeleton { height: 148px; border-radius: 12px; background: linear-gradient(90deg, var(--surface) 25%, #F1F2F4 50%, var(--surface) 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .more { display: flex; justify-content: center; margin-top: 16px; }
+
+  /* ---------- empty states ---------- */
+  .empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 56px 24px; border: 1px dashed var(--border); border-radius: 12px; text-align: center; }
+  .empty .bubble { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 16px; background: var(--accent-soft); color: var(--accent); }
+  .empty h2 { font-size: 17px; font-weight: 600; }
+  .empty p { color: var(--muted); max-width: 380px; }
+  .empty .btn { margin-top: 12px; }
+
+  /* ---------- project detail / proof ---------- */
+  .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; color: var(--muted); font-size: 14px; font-weight: 500; text-decoration: none; }
+  .back:hover { color: var(--text); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .detail-head h1 { overflow-wrap: anywhere; }
+  .meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; color: var(--muted); font-size: 14px; }
+  .summary { margin: 22px 0; padding: 18px 22px; border: 1px solid var(--border); border-radius: 12px; }
+  .summary-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .summary-top strong { font-size: 15px; font-weight: 600; }
+  .summary .bar { flex: none; height: 6px; margin-top: 14px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .section-title { margin-bottom: 10px; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  .milestones { margin: 0; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: 12px; }
+  .ms { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 4px 14px; padding: 16px 20px; }
+  .ms + .ms { border-top: 1px solid var(--border); }
+  .ms .state { color: #C4C8CF; }
+  .ms.done .state { color: var(--success); }
+  .ms.overdue .state { color: var(--overdue); }
+  .ms .title { font-weight: 600; overflow-wrap: anywhere; }
+  .ms .info { display: flex; flex-wrap: wrap; gap: 2px 10px; margin-top: 2px; color: var(--muted); font-size: 13px; }
+  .ms .info > span + span::before, .ms .info > a::before { content: '·'; margin-right: 10px; color: #C4C8CF; }
+  .ms .info a { display: inline-block; }
+  .ms .row-error { grid-column: 2 / -1; color: var(--overdue); font-size: 13px; }
+  .note { margin-top: 14px; color: var(--muted); font-size: 13px; }
+
+  /* ---------- proof tab / profile ---------- */
+  .panel { padding: 20px 22px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; }
+  .panel h2 { font-size: 16px; font-weight: 600; }
+  .panel > p { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .inline-form { display: flex; gap: 8px; margin-top: 14px; }
+  .inline-form input { flex: 1; min-width: 0; min-height: 40px; padding: 0 14px; border: 1px solid var(--border); border-radius: 10px; outline: none; }
+  .inline-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .share-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; }
+  .share-row + .share-row { border-top: 1px solid var(--border); }
+  .share-row .who { min-width: 0; }
+  .share-row .who b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .share-row .who span { color: var(--muted); font-size: 13px; }
+  .share-row .btns { display: flex; gap: 6px; flex: none; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat { padding: 16px 18px; border: 1px solid var(--border); border-radius: 12px; }
+  .stat b { display: block; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .kv { display: grid; grid-template-columns: 110px 1fr; gap: 10px 16px; margin-top: 14px; font-size: 14px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+  /* ---------- new project dialog ---------- */
+  dialog { width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 0; border-radius: 16px; color: var(--text); box-shadow: 0 24px 64px rgba(17, 24, 39, .25); }
+  dialog[open] { display: flex; }
+  dialog::backdrop { background: rgba(17, 24, 39, .45); }
+  dialog form { display: flex; flex-direction: column; width: 100%; min-height: 0; }
+  .dlg-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 6px; }
+  .dlg-head h2 { font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+  .dlg-body { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 22px 6px; }
+  .dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px 18px; border-top: 1px solid var(--border); }
+  .field { display: block; margin-bottom: 16px; }
+  .field > span { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+  .field small { display: block; margin-top: 6px; color: var(--muted); font-size: 12.5px; }
+  .ms-row { display: grid; grid-template-columns: 1fr 156px 36px; gap: 8px; margin-bottom: 8px; }
+  .ms-row .icon-btn { height: 44px; }
+  .ms-row .icon-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .form-error { margin: 0 22px 12px; padding: 10px 12px; border-radius: 10px; background: var(--overdue-soft); color: var(--overdue); font-size: 13.5px; }
+
+  /* ---------- landing page ---------- */
+  #launch { display: none; }
+  body.landing #launch { display: inline-flex; }
+  body.landing #wallet-slot, body.landing .side { display: none; }
+  body.landing .page { position: relative; margin-left: 0; padding-bottom: 0; overflow-x: clip; }
+  body.landing .page::before { content: ''; position: absolute; inset: 0 0 auto; height: max(100svh, 700px); background: linear-gradient(180deg, #6D3BEB 0%, #5B4CDB 34%, #4C8FE6 64%, #8FE1EA 88%, #fff 100%); }
+  body.landing .page > * { position: relative; }
+  body.landing .wordmark { display: flex; color: #fff; }
+  body.landing .mark { background: rgba(255, 255, 255, .18); }
+  body.landing .top, body.landing main { width: 100%; max-width: 1128px; margin: 0 auto; }
+  body.landing .top { padding: 14px 24px; }
+  body.landing main { padding-top: 0; }
+  body.landing .notice { background: rgba(255, 255, 255, .16); color: #fff; }
+  body.landing .top :focus-visible, .hero :focus-visible, .tool :focus-visible, .suite :focus-visible { outline-color: #fff; }
+  body.landing #launch, .btn.white { background: #fff; color: var(--accent); box-shadow: 0 2px 12px rgba(17, 24, 39, .14); }
+  body.landing #launch:hover, .btn.white:hover { background: var(--accent-soft); }
+  .btn.lg { min-height: 50px; min-width: 220px; padding: 0 22px; border-radius: 12px; font-size: 15px; }
+
+  /* hero: centred question on a gradient, with objects floating around it */
+  .hero { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: max(calc(100svh - 124px), 580px); padding: 32px 0 104px; color: #fff; text-align: center; }
+  .hero-copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+  .hero h1 { max-width: 9.5em; font-size: clamp(42px, 6.6vw, 80px); font-weight: 500; line-height: 1.06; letter-spacing: -.04em; }
+  .hero-sub { max-width: 400px; margin-top: 18px; color: rgba(255, 255, 255, .94); font-size: 17px; line-height: 1.5; }
+  .hero .btn { margin-top: 26px; }
+  .rise { opacity: 0; animation: rise .8s cubic-bezier(.2, .7, .2, 1) forwards; animation-delay: calc(var(--d, 0) * 110ms); }
+  @keyframes rise { from { translate: 0 20px; } to { opacity: 1; } }
+  .scroll-pill { position: absolute; z-index: 1; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; padding: 11px 18px; border: 0; border-radius: 14px; background: #fff; color: var(--text); font-size: 14.5px; font-weight: 500; white-space: nowrap; box-shadow: 0 4px 20px rgba(17, 24, 39, .12); }
+  .scroll-pill svg { animation: bob 1.4s ease-in-out infinite; }
+  @keyframes bob { 50% { translate: 0 4px; } }
+
+  .fl { position: absolute; transform: translate(calc(var(--mx, 0) * var(--p, 12) * 1px), calc(var(--my, 0) * var(--p, 12) * 1px)) rotate(var(--r, 0deg)); transition: transform .6s cubic-bezier(.2, .7, .2, 1); animation: popin .7s cubic-bezier(.3, 1.5, .5, 1) backwards, floaty 6s ease-in-out infinite; animation-delay: calc(var(--i) * 110ms + 250ms), calc(var(--i) * -1.1s); }
+  @keyframes popin { from { scale: 0; opacity: 0; } }
+  @keyframes floaty { 50% { translate: 0 -14px; } }
+  .fl.stampy { --i: 0; --p: 24; --r: -6deg; left: 6%; top: 4%; width: 132px; filter: drop-shadow(0 16px 22px rgba(17, 24, 39, .22)); }
+  .fl.orb, .fl.disc { display: grid; place-items: center; border-radius: 50%; color: #fff; box-shadow: inset -6px -9px 18px rgba(0, 0, 0, .16), inset 4px 6px 12px rgba(255, 255, 255, .35), 0 16px 30px rgba(17, 24, 39, .2); }
+  .fl.orb { --i: 1; --p: 14; right: 28%; top: 2%; width: 78px; height: 78px; background: radial-gradient(circle at 32% 28%, #BBF7C9, #22C55E 55%, #15803D); }
+  .fl.disc { --i: 2; --p: 30; left: 0; top: 52%; width: 84px; height: 84px; background: radial-gradient(circle at 32% 28%, #CDE9FF, #3B82F6 55%, #1D4ED8); }
+  .fl.vbadge { --i: 3; --p: 26; --r: 8deg; right: 2%; top: 34%; display: flex; align-items: center; gap: 8px; padding: 13px 20px; border-radius: 18px; background: #fff; color: var(--success); font-size: 19px; font-weight: 700; box-shadow: 0 16px 32px rgba(17, 24, 39, .18); }
+  .fl.note { --i: 4; --p: 18; --r: -7deg; right: 6%; bottom: 15%; width: 118px; height: 118px; padding: 14px; border-radius: 6px; background: #FFD84D; color: var(--text); text-align: left; box-shadow: 0 16px 28px rgba(17, 24, 39, .18); }
+  .fl.note small { display: block; font-size: 12px; font-weight: 600; opacity: .7; }
+  .fl.note b { display: block; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; }
+  .fl.note svg { margin-top: 8px; color: var(--accent); }
+  .fl.mini { --i: 5; --p: 16; --r: -9deg; left: 8%; bottom: 12%; width: 176px; padding: 14px; border-radius: 16px; background: #fff; color: var(--text); font-size: 12.5px; font-weight: 600; text-align: left; box-shadow: 0 16px 32px rgba(17, 24, 39, .18); }
+  .fl.mini div { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .fl.mini svg { color: var(--success); }
+  .fl.mini div:nth-of-type(3) svg { color: #C4C8CF; }
+  .fl.mini .bar { margin-top: 8px; }
+
+  /* mascot */
+  .mascot svg { display: block; width: 100%; overflow: visible; }
+  .mascot.perch { position: absolute; left: 20px; bottom: calc(100% - 9px); width: 92px; }
+  .m-hop { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 3s ease-in-out infinite; }
+  .mascot.hop .m-hop { animation: hop 1.2s cubic-bezier(.3, 0, .3, 1); }
+  .mascot.loop .m-hop { animation: hop 2.4s cubic-bezier(.3, 0, .3, 1) infinite; }
+  .m-eye { transform-box: fill-box; transform-origin: center; animation: blink 4.2s infinite; }
+  .m-arm { transform-box: fill-box; transform-origin: 100% 100%; animation: wave 1.4s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: scale(1.02, .97); } }
+  @keyframes hop {
+    0%, 100% { transform: none; }
+    22% { transform: scale(1.1, .86); }
+    58% { transform: translateY(-24px) scale(.95, 1.06); }
+    88% { transform: scale(1.14, .84); }
+    94% { transform: scale(.98, 1.03); }
+  }
+  @keyframes blink { 0%, 91%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes wave { 50% { transform: rotate(-20deg); } }
+
+  /* sections */
+  .sec { padding: 72px 0 8px; }
+  .sec > h2, .final h2 { max-width: 13em; margin: 0 auto 28px; font-size: clamp(30px, 4.6vw, 50px); font-weight: 500; line-height: 1.1; letter-spacing: -.035em; text-align: center; }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease-out, transform .7s cubic-bezier(.2, .7, .2, 1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .toolbar { position: sticky; top: 12px; z-index: 5; display: flex; gap: 4px; width: fit-content; margin: 0 auto 24px; padding: 6px; border-radius: 999px; background: #fff; box-shadow: 0 4px 22px rgba(17, 24, 39, .13); }
+  .tb { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 88px; padding: 8px 14px; border: 0; border-radius: 999px; background: none; color: var(--text); font-size: 12.5px; font-weight: 600; transition: background .2s, color .2s; }
+  .tb svg { color: var(--accent); transition: color .2s; }
+  .tb:hover { background: var(--surface); }
+  .tb.active { background: linear-gradient(135deg, #7C3AED, #5B4CDB 55%, #3B82F6); color: #fff; }
+  .tb.active svg { color: #fff; }
+  .tools { display: grid; gap: 20px; }
+  .tool { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: 32px; min-height: 420px; padding: 44px; border-radius: 28px; overflow: hidden; color: #fff; scroll-margin-top: 110px; }
+  .tool h3, .suite h3 { font-size: clamp(25px, 3.2vw, 38px); font-weight: 500; line-height: 1.14; letter-spacing: -.025em; }
+  .tool p, .suite p { max-width: 26em; margin-top: 12px; font-size: 16px; opacity: .93; }
+  .tool .btn, .suite .btn { margin-top: 24px; }
+  .tool.create { background: linear-gradient(160deg, #C22BD6, #7C3AED); }
+  .tool.stamp { background: linear-gradient(160deg, #F4617A, #E0396A); }
+  .tool.share { background: #FAD4DA; color: var(--text); }
+  .tool.verify { background: linear-gradient(160deg, #4F46E5, #2F7DEB); }
+  .art { position: relative; display: grid; place-items: center; min-height: 280px; }
+  .mock { width: 100%; max-width: 400px; padding: 20px; border-radius: 18px; background: #fff; color: var(--text); text-align: left; box-shadow: 0 24px 50px rgba(17, 24, 39, .25); }
+  .mock h4 { margin: 0; font-size: 15px; font-weight: 600; }
+  .fld { margin-top: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13.5px; font-weight: 500; }
+  .fld small { display: block; color: var(--muted); font-size: 11px; font-weight: 500; }
+  .mrow { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 9px 12px; border-radius: 10px; background: var(--surface); font-size: 13px; font-weight: 600; animation: rowin 6s ease-out infinite; animation-delay: calc(var(--i) * .45s); }
+  .mrow span:last-child { color: var(--muted); font-weight: 500; }
+  @keyframes rowin { 0% { opacity: 0; translate: 0 10px; } 8%, 90% { opacity: 1; translate: 0; } 100% { opacity: 0; } }
+  .fake-btn { margin-top: 12px; padding: 10px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 600; text-align: center; }
+  .cursor { position: absolute; z-index: 2; display: flex; align-items: flex-start; animation: roam 5s ease-in-out infinite; }
+  .cursor svg { width: 24px; height: 24px; flex: none; }
+  .cursor b { margin: 16px 0 0 -4px; padding: 4px 11px; border: 2px solid #fff; border-radius: 11px; background: var(--c); color: #fff; font-size: 13px; font-weight: 600; }
+  @keyframes roam { 50% { translate: -28px 16px; } }
+  .browser { padding: 0; overflow: hidden; }
+  .bbar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .bbar i { width: 9px; height: 9px; border-radius: 50%; background: #D1D5DB; }
+  .burl { flex: 1; margin-left: 6px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 999px; background: #fff; color: var(--muted); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .burl span { display: inline-block; width: 0; overflow: hidden; white-space: nowrap; vertical-align: bottom; animation: typing 6s steps(25) infinite; }
+  @keyframes typing { 45%, 100% { width: 25ch; } }
+  .bbody { padding: 18px 20px 8px; }
+  .bbody .eyebrow { margin-bottom: 4px; font-size: 10.5px; }
+  .vrow { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 10px; padding: 12px 0; font-size: 14px; font-weight: 600; }
+  .vrow + .vrow, .bbody .vrow { border-top: 1px solid var(--border); }
+  .vrow > svg { color: var(--success); }
+  .vrow small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+  .tool.in .vrow .pill { animation: pop .5s cubic-bezier(.3, 1.6, .5, 1) backwards; animation-delay: calc(var(--i) * .25s + .4s); }
+  .mock-foot { margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; }
+
+  /* live demo card */
+  .tool.stamp .art { padding-top: 92px; }
+  .demo { position: relative; width: 100%; max-width: 420px; padding: 22px 22px 8px; border-radius: 18px; background: #fff; color: var(--text); text-align: left; box-shadow: 0 24px 50px rgba(17, 24, 39, .25); animation: floaty 6s ease-in-out infinite; }
+  .demo-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .demo h4 { margin: 0; font-size: 16px; font-weight: 600; }
+  .demo .client { color: var(--muted); font-size: 14px; }
+  .demo .bar i { transition: width .6s cubic-bezier(.2, .7, .2, 1), background .3s; }
+  .demo-list { margin-top: 16px; }
+  .demo-ms { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 12px; padding: 13px 0; border-top: 1px solid var(--border); font-size: 14px; font-weight: 600; }
+  .demo-ms .due { color: var(--muted); font-size: 12.5px; font-weight: 400; }
+  .demo-ms .st, .demo-ms .tag { display: grid; place-items: center; }
+  .demo-ms .tag { justify-items: end; }
+  .demo-ms .st > *, .demo-ms .tag > * { grid-area: 1 / 1; transition: opacity .25s; }
+  .demo-ms .st { color: #C4C8CF; }
+  .demo-ms .st .o, .demo-ms .st .ok { display: grid; }
+  .demo-ms .st .spin { color: var(--accent); }
+  .demo-ms .st .ok { color: var(--success); }
+  .demo-ms .t-open { padding: 5px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; }
+  .demo-ms .t-busy { color: var(--accent); font-size: 12.5px; }
+  .demo-ms .st .spin, .demo-ms .st .ok, .demo-ms .t-busy, .demo-ms .t-done { opacity: 0; }
+  .demo-ms.busy .st .o, .demo-ms.done .st .o, .demo-ms.busy .t-open, .demo-ms.done .t-open { opacity: 0; }
+  .demo-ms.busy .st .spin, .demo-ms.busy .t-busy, .demo-ms.done .st .ok, .demo-ms.done .t-done { opacity: 1; }
+  .demo-ms.done .st .ok, .demo-ms.done .t-done { animation: pop .45s cubic-bezier(.3, 1.6, .5, 1); }
+  @keyframes pop { from { transform: scale(.5); } }
+
+  /* meet Stampy + closing */
+  .suite { position: relative; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; padding: 48px; border-radius: 28px; overflow: hidden; background: linear-gradient(135deg, #6D3BEB, #5B4CDB 45%, #3B82F6); color: #fff; }
+  .suite-art { position: relative; display: grid; place-items: center; min-height: 260px; }
+  .suite-art .mascot { width: 176px; filter: drop-shadow(0 18px 24px rgba(17, 24, 39, .25)); }
+  .chip { position: absolute; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #fff; color: var(--text); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 10px 28px rgba(17, 24, 39, .16); animation: floaty 5s ease-in-out infinite; }
+  .chip svg { color: var(--success); }
+  .chip.c1 { left: 0; top: 12%; animation-delay: -1s; }
+  .chip.c2 { right: 0; top: 30%; animation-delay: -2.5s; }
+  .chip.c3 { left: 6%; bottom: 8%; animation-delay: -4s; }
+  .final { padding: 96px 0 56px; text-align: center; }
+  .final h2 { margin-bottom: 24px; }
+
+  @media (max-width: 860px) {
+    body.landing .top { padding: 12px 16px; }
+    .hero { min-height: max(calc(100svh - 150px), 600px); }
+    .fl.stampy { left: 2%; top: 0; width: 96px; }
+    .fl.orb { right: 26%; top: 5%; width: 60px; height: 60px; }
+    .fl.disc { left: -30px; top: 50%; width: 70px; height: 70px; }
+    .fl.vbadge { right: -38px; top: 40%; padding: 10px 16px; font-size: 16px; }
+    .fl.note { right: -30px; bottom: 19%; width: 96px; height: 96px; }
+    .fl.note b { font-size: 18px; }
+    .fl.mini { left: -46px; bottom: 11%; width: 160px; }
+    .sec { padding-top: 56px; }
+    .tb { min-width: 0; padding: 8px 13px; }
+    .tool, .suite { grid-template-columns: 1fr; gap: 24px; min-height: 0; padding: 26px 22px 30px; border-radius: 22px; }
+    .tool .btn, .suite .btn { width: 100%; }
+    .art { min-height: 0; }
+    .final { padding: 64px 0 40px; }
+  }
+
+  /* ---------- toast ---------- */
+  .toast { position: fixed; z-index: 60; right: 20px; bottom: 20px; display: flex; align-items: flex-start; gap: 12px; width: min(360px, calc(100vw - 32px)); padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); box-shadow: 0 12px 36px rgba(17, 24, 39, .14); transform: translateY(12px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+  .toast.show { transform: none; opacity: 1; pointer-events: auto; }
+  .toast b { display: block; font-weight: 600; }
+  .toast p { color: var(--muted); font-size: 13.5px; }
+  .toast .grow { flex: 1; min-width: 0; }
+
+  /* ---------- footer ---------- */
+  .foot { padding: 0 24px 28px; }
+  .foot-in { display: flex; align-items: center; justify-content: space-between; gap: 24px 40px; width: 100%; max-width: 720px; margin: 0 auto; padding: 26px 32px; border-radius: 24px; background: var(--accent-soft); color: var(--muted); font-size: 12.5px; }
+  body.landing .foot-in { max-width: 1080px; }
+  .foot-name { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-size: 16px; font-weight: 700; letter-spacing: -.01em; text-decoration: none; }
+  .foot .mark, body.landing .foot .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--accent); }
+  .foot-brand p { margin-top: 8px; font-size: 13.5px; }
+  .foot-chain { display: flex; align-items: center; gap: 22px; }
+  .foot-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .foot-logo { display: block; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: #fff; transition: transform .2s, box-shadow .2s; }
+  .foot-logo:hover { transform: translateY(-3px) rotate(-3deg); box-shadow: 0 10px 22px rgba(91, 76, 219, .22); }
+  .foot-logo img { display: block; width: 64px; height: 64px; border-radius: 18px; }
+  .foot-built { color: var(--text); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .foot-explorer { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border: 1px solid var(--accent); border-radius: 999px; background: #fff; color: var(--accent); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s, color .15s; }
+  .foot-explorer:hover { background: var(--accent); color: #fff; }
+
+  /* ---------- mobile: sidebar becomes a bottom tab bar ---------- */
+  @media (max-width: 720px) {
+    .side { inset: auto 0 0 0; width: auto; height: calc(var(--tabbar) + env(safe-area-inset-bottom)); flex-direction: row; justify-content: space-around; align-items: flex-start; gap: 0; padding: 6px 8px env(safe-area-inset-bottom); border-right: 0; border-top: 1px solid var(--border); }
+    .side .mark { display: none; }
+    .nav-item { width: 72px; padding: 7px 0 5px; }
+    .page { margin-left: 0; padding-bottom: calc(var(--tabbar) + env(safe-area-inset-bottom)); }
+    body.proof .page { padding-bottom: 0; }
+    .wordmark { display: flex; }
+    .top, body.proof .top { padding: 12px 16px; min-height: 60px; }
+    main { padding: 8px 16px 56px; }
+    h1 { font-size: 26px; }
+    .card { padding: 18px; }
+    .head .btn .long { display: none; }
+    .ms { grid-template-columns: 24px 1fr; padding: 16px; }
+    .ms .act { grid-column: 2; justify-self: start; margin-top: 8px; }
+    .ms-row { grid-template-columns: 1fr 36px; }
+    .ms-row input[type="text"] { grid-column: 1 / -1; }
+    .share-row { flex-direction: column; align-items: stretch; }
+    .stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { padding: 12px; }
+    .kv { grid-template-columns: 1fr; gap: 2px; }
+    .kv dd { margin-bottom: 10px; }
+    .toast { right: 16px; bottom: calc(var(--tabbar) + 12px + env(safe-area-inset-bottom)); }
+    body.proof .toast { bottom: 16px; }
+    .foot { padding: 0 16px 20px; }
+    .foot-in { flex-direction: column; padding: 26px 20px; text-align: center; }
+    .foot-chain { flex-direction: column; gap: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0s !important; transition-duration: 0s !important; } }
+</style>
+</head>
+<body>
+
+<nav class="side" aria-label="Main">
+  <a class="mark" id="side-mark" href="./" aria-label="Freelance Flow home"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></a>
+  <a class="nav-item" data-nav="projects" href="#/projects"><span data-icon="folder" data-size="22"></span>Projects</a>
+  <button class="nav-item" data-nav="new" type="button" id="nav-new"><span data-icon="plusSquare" data-size="22"></span>New</button>
+  <a class="nav-item" data-nav="proof" href="#/proof"><span data-icon="shield" data-size="22"></span>Proof</a>
+  <a class="nav-item" data-nav="profile" href="#/profile"><span data-icon="user" data-size="22"></span>Profile</a>
+</nav>
+
+<div class="page">
+  <header class="top">
+    <a class="wordmark" id="wordmark" href="./"><span class="mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></span>Freelance Flow</a>
+    <div id="wallet-slot"></div>
+    <a class="btn primary" id="launch" href="#/projects">Launch app</a>
+  </header>
+  <div class="notice" id="notice" hidden></div>
+  <main id="view"></main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div class="foot-brand">
+        <a class="foot-name" id="foot-home" href="./"><span class="mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></span>Freelance Flow</a>
+        <p>Every milestone you finish, stamped on BOT Chain.</p>
+      </div>
+      <div class="foot-chain">
+        <div class="foot-col">
+          <a class="foot-logo" href="https://botchain.ai" target="_blank" rel="noopener" aria-label="BOT Chain"><img src="images/bot-chain.png" alt="BOT Chain" width="64" height="64" loading="lazy"></a>
+          <span class="foot-built">Built on</span>
+        </div>
+        <div class="foot-col">
+          <a class="foot-explorer" id="foot-explorer" href="https://scan.botchain.ai/" target="_blank" rel="noopener">View on explorer<span data-icon="external" data-size="15"></span></a>
+          <span id="foot-net">(BOT Chain, chain ID 677)</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<dialog id="new-dialog" aria-labelledby="new-title">
+  <form id="new-form" novalidate>
+    <div class="dlg-head">
+      <h2 id="new-title">New project</h2>
+      <button class="icon-btn" type="button" id="np-close" aria-label="Close"><span data-icon="x" data-size="20"></span></button>
+    </div>
+    <div class="dlg-body">
+      <label class="field"><span>Project title</span><input type="text" id="np-title" maxlength="80" placeholder="Brand identity refresh" autocomplete="off"></label>
+      <label class="field"><span>Client</span><input type="text" id="np-client" maxlength="60" placeholder="Studio Nara" autocomplete="off"><small>Stored publicly on BOT Chain. Use a studio name or initials, not private details.</small></label>
+      <div class="field">
+        <span>Milestones <span id="np-count" style="color:var(--muted);font-weight:500"></span></span>
+        <div id="np-rows"></div>
+        <button class="btn ghost sm" type="button" id="np-add"><span data-icon="plus" data-size="16"></span>Add milestone</button>
+      </div>
+    </div>
+    <p class="form-error" id="np-error" role="alert" hidden></p>
+    <div class="dlg-foot">
+      <button class="btn outline" type="button" id="np-cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="np-submit">Create on BOT Chain</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="grow"><b id="toast-title"></b><p id="toast-body"></p><a class="link" id="toast-link" target="_blank" rel="noopener" hidden></a></div>
+  <button class="icon-btn" type="button" id="toast-close" aria-label="Dismiss" style="margin:-6px -8px 0 0"><span data-icon="x" data-size="16"></span></button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.5/ethers.umd.min.js" crossorigin="anonymous"></script>
+<script>
+(() => {
+  'use strict';
+
+  // ============================================================
+  // Config — the only values to edit after deploying.
+  // The footer, the app and the client pages all read the contract address from here.
+  // ============================================================
+  const CONFIG = {
+    networks: {
+      mainnet: { chainId: 677, name: 'BOT Chain', rpc: 'https://rpc.botchain.ai', explorer: 'https://scan.botchain.ai', contract: '0xcf3b9ce7959aD5926438978CAC1447655e0d8C17' },
+      testnet: { chainId: 968, name: 'BOT Chain Testnet', rpc: 'https://rpc.bohr.life', explorer: 'https://scan.bohr.life', contract: '' },
+    },
+  };
+
+  const MAX_MILESTONES = 10;
+  const MAX_TITLE_BYTES = 80;
+  const MAX_CLIENT_BYTES = 60;
+  const PAGE_SIZE = 10;
+  const DAY = 86400;
+
+  const ABI = [
+    'function createProject(string title, string client, string[] titles, uint64[] dueDates) returns (uint256 id)',
+    'function completeMilestone(uint256 projectId, uint8 index)',
+    'function getProject(uint256 id) view returns (tuple(address owner, string title, string client, uint64 createdAt, uint8 total, uint8 done), tuple(string title, uint64 dueDate, uint64 completedAt)[])',
+    'function projectsOf(address owner) view returns (uint256[])',
+    'event ProjectCreated(uint256 indexed id, address indexed owner, string title)',
+    'event MilestoneCompleted(uint256 indexed projectId, uint8 index, uint64 completedAt)',
+    'error InvalidTitle()', 'error InvalidClient()', 'error InvalidMilestones()', 'error InvalidDueDate()',
+    'error ProjectNotFound()', 'error MilestoneNotFound()', 'error NotOwner()', 'error AlreadyCompleted()',
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  // ?net=local (localhost only) points the app at the throwaway chain from tools/local-chain.mjs.
+  const netKey = params.get('net') === 'testnet' ? 'testnet' : isLocal && params.get('net') === 'local' ? 'local' : 'mainnet';
+  const NET = netKey === 'local'
+    ? { chainId: 1337, name: 'Local chain', rpc: 'http://127.0.0.1:8545', explorer: '', contract: ethers.isAddress(params.get('contract')) ? params.get('contract') : '' }
+    : { ...CONFIG.networks[netKey] };
+  // On localhost, pick up an address deployed from deploy.html so it can be tried before editing CONFIG.
+  if (!NET.contract && isLocal) NET.contract = storage('ff.contract.' + NET.chainId) || '';
+  const PREVIEW = !NET.contract; // no contract yet: projects are simulated in this browser
+  const CHAIN_HEX = '0x' + NET.chainId.toString(16);
+  const DEMO_ACCOUNT = '0xDe3000000000000000000000000000000000dE30';
+  const proofParam = params.get('project');
+  const PROOF_MODE = proofParam !== null;
+
+  const eth = () => window.ethereum; // read lazily: wallets can inject after load
+  const state = {
+    account: null, chainId: null,
+    projects: null, loading: false, loadError: false, request: 0,
+    tab: 'active', q: '', sort: 'newest', filter: 'all', shown: PAGE_SIZE,
+    detail: null, // { id, status: 'loading' | 'ready' | 'missing' | 'error', project }
+    busy: null, rowError: null, // milestone key 'projectId:index'
+    txs: {}, // projectId -> { index: txHash }
+  };
+  let readContract = null;
+
+  // ============================================================
+  // Small helpers
+  // ============================================================
+  const $ = (id) => document.getElementById(id);
+  const now = () => Math.floor(Date.now() / 1000);
+  const short = (a) => a.slice(0, 6) + '…' + a.slice(-4);
+  const bytes = (s) => new TextEncoder().encode(s).length;
+  const sameAddress = (a, b) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
+
+  function storage(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value);
+    } catch { /* storage unavailable: carry on without it */ }
+    return null;
+  }
+
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else if (v === true) el.setAttribute(k, '');
+      else el.setAttribute(k, v);
+    }
+    el.append(...kids.flat().filter((c) => c != null && c !== false));
+    return el;
+  }
+
+  const ICONS = {
+    folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+    plusSquare: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/>',
+    shield: '<path d="M12 3l7 2.8v5.4c0 4.3-2.9 7.9-7 9.8-4.1-1.9-7-5.5-7-9.8V5.8z"/><path d="M9 12l2.2 2.2L15 10.2"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-3.3 4-5 7.5-5s6.3 1.7 7.5 5"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+    sort: '<path d="M7 5v14M4 16l3 3 3-3M17 19V5M14 8l3-3 3 3"/>',
+    filter: '<path d="M4 6.5h16M7 12h10M10 17.5h4"/>',
+    chevron: '<path d="M6 9l6 6 6-6"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    checkCircle: '<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16 9.5"/>',
+    circle: '<circle cx="12" cy="12" r="9"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    external: '<path d="M14 5h5v5M19 5l-8 8M11 6H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4"/>',
+    arrowLeft: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    arrowRight: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    arrowDown: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    wallet: '<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17a2 2 0 0 1 2 2v1"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><path d="M16 13.5h.01"/>',
+    sparkle: '<path d="M11 3.5l1.7 4.8 4.8 1.7-4.8 1.7L11 16.5l-1.7-4.8L4.5 10l4.8-1.7zM18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  };
+  function icon(name, size = 18) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', name === 'sparkle' ? 'i fill' : 'i');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = ICONS[name];
+    return svg;
+  }
+
+  const dueFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  const stampFmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const stampFullFmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  // Due dates are whole days stored as UTC midnight, so everyone sees the same calendar date.
+  const fmtDue = (ts) => dueFmt.format(new Date(ts * 1000));
+  const fmtStamp = (ts) => stampFmt.format(new Date(ts * 1000));
+  const fmtStampFull = (ts) => stampFullFmt.format(new Date(ts * 1000));
+
+  const isDone = (p) => p.done >= p.total;
+  const isOverdue = (m) => !m.completedAt && now() >= m.dueDate + DAY; // overdue once the due day has ended
+  const hasOverdue = (p) => p.milestones.some(isOverdue);
+  const nextDue = (p) => p.milestones.filter((m) => !m.completedAt).sort((a, b) => a.dueDate - b.dueDate)[0] || null;
+  const lastStamp = (p) => Math.max(0, ...p.milestones.map((m) => m.completedAt));
+
+  // Keeps ?net= (and the local contract) when moving between the app and client pages.
+  function url({ project, hash = '' } = {}) {
+    const q = new URLSearchParams();
+    if (project !== undefined) q.set('project', project);
+    if (netKey !== 'mainnet') q.set('net', netKey);
+    if (netKey === 'local' && params.get('contract')) q.set('contract', params.get('contract'));
+    const qs = q.toString();
+    return location.pathname + (qs ? '?' + qs : '') + hash;
+  }
+  const proofUrl = (id) => location.origin + url({ project: id });
+  const txUrl = (hash) => (NET.explorer && hash ? `${NET.explorer}/tx/${hash}` : null);
+  const addressUrl = (address) => (NET.explorer ? `${NET.explorer}/address/${address}` : null);
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = h('textarea', { style: 'position:fixed;opacity:0' });
+      ta.value = text;
+      document.body.append(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+  }
+
+  let toastTimer = 0;
+  function toast(title, body = '', link = null) {
+    $('toast-title').textContent = title;
+    $('toast-body').textContent = body;
+    $('toast-link').hidden = !link;
+    if (link) { $('toast-link').textContent = link.label; $('toast-link').href = link.href; }
+    $('toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 7000);
+  }
+  function hideToast() { $('toast').classList.remove('show'); }
+
+  function setBusy(btn, label) {
+    btn.disabled = true;
+    btn.classList.add('busy');
+    btn.replaceChildren(h('span', { class: 'spin' }), label);
+  }
+
+  function errorText(e, fallback = 'The transaction did not go through. Please try again.') {
+    console.error(e);
+    if (e.code === 4001 || e.code === 'ACTION_REJECTED') return 'You rejected the request in MetaMask. Nothing was stamped.';
+    if (e.code === 'WRONG_NETWORK') return `MetaMask is on a different network. Switch to ${NET.name} and try again.`;
+    if (e.code === 'INSUFFICIENT_FUNDS') return 'This wallet does not have enough BOT to pay for gas.';
+    if (e.code === -32002) return 'MetaMask already has a request open. Open MetaMask to continue.';
+    const reverts = {
+      NotOwner: 'Only the wallet that created this project can complete its milestones.',
+      AlreadyCompleted: 'This milestone is already completed.',
+      InvalidTitle: 'Titles must be 1–80 characters.',
+      InvalidClient: 'The client name must be 1–60 characters.',
+      InvalidMilestones: 'A project needs 1–10 milestones.',
+      InvalidDueDate: 'Every milestone needs a due date.',
+    };
+    return reverts[e.revert?.name] || fallback;
+  }
+
+  // ============================================================
+  // Project storage: BOT Chain, or this browser while in preview mode
+  // ============================================================
+  const fromChain = (id, [p, ms]) => ({
+    id, owner: p.owner, title: p.title, client: p.client, createdAt: Number(p.createdAt), total: Number(p.total), done: Number(p.done),
+    milestones: ms.map((m) => ({ title: m.title, dueDate: Number(m.dueDate), completedAt: Number(m.completedAt) })),
+  });
+
+  async function signerContract() {
+    const signer = await new ethers.BrowserProvider(eth()).getSigner();
+    return new ethers.Contract(NET.contract, ABI, signer);
+  }
+  const parsedEvent = (contract, receipt, name) => {
+    for (const log of receipt.logs) {
+      try { const parsed = contract.interface.parseLog(log); if (parsed?.name === name) return parsed; } catch { /* not ours */ }
+    }
+    return null;
+  };
+
+  const chainStore = {
+    idsOf: async (address) => (await readContract.projectsOf(address)).map(Number),
+    // Returns the project, or null when the id does not exist. Throws when the chain can't be reached.
+    async get(id) {
+      try {
+        return fromChain(id, await readContract.getProject(id));
+      } catch (e) {
+        if (e.revert?.name === 'ProjectNotFound') return null;
+        throw e;
+      }
+    },
+    async create(title, client, titles, dueDates) {
+      const contract = await signerContract();
+      const tx = await contract.createProject(title, client, titles, dueDates);
+      const receipt = await tx.wait();
+      const created = parsedEvent(contract, receipt, 'ProjectCreated');
+      if (!created) throw new Error('ProjectCreated event missing');
+      const block = await receipt.getBlock().catch(() => null);
+      return { id: Number(created.args.id), hash: tx.hash, createdAt: block ? block.timestamp : now() };
+    },
+    async complete(id, index) {
+      const contract = await signerContract();
+      const tx = await contract.completeMilestone(id, index);
+      const receipt = await tx.wait();
+      const completed = parsedEvent(contract, receipt, 'MilestoneCompleted');
+      return { hash: tx.hash, completedAt: completed ? Number(completed.args.completedAt) : now() };
+    },
+    // Completion transactions aren't stored in the contract, so look them up from its events.
+    async txHashes(id) {
+      const logs = await readContract.queryFilter(readContract.filters.MilestoneCompleted(id));
+      return Object.fromEntries(logs.map((l) => [Number(l.args.index), l.transactionHash]));
+    },
+  };
+
+  const previewRead = () => { try { return JSON.parse(storage('ff.preview')) || []; } catch { return []; } };
+  const previewWrite = (list) => storage('ff.preview', JSON.stringify(list));
+  const fromPreview = (p, id) => ({ ...p, id, total: p.milestones.length, done: p.milestones.filter((m) => m.completedAt).length });
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  const previewStore = {
+    idsOf: async (address) => previewRead().flatMap((p, id) => (sameAddress(p.owner, address) ? [id] : [])),
+    async get(id) {
+      const p = previewRead()[id];
+      return p ? fromPreview(p, id) : null;
+    },
+    async create(title, client, titles, dueDates) {
+      await pause(900);
+      const list = previewRead();
+      const createdAt = now();
+      list.push({ owner: state.account, title, client, createdAt, milestones: titles.map((t, i) => ({ title: t, dueDate: dueDates[i], completedAt: 0 })) });
+      previewWrite(list);
+      return { id: list.length - 1, hash: null, createdAt };
+    },
+    async complete(id, index) {
+      await pause(900);
+      const list = previewRead();
+      const completedAt = now();
+      list[id].milestones[index].completedAt = completedAt;
+      previewWrite(list);
+      return { hash: null, completedAt };
+    },
+    txHashes: async () => ({}),
+  };
+  const store = PREVIEW ? previewStore : chainStore;
+
+  // ============================================================
+  // Wallet
+  // ============================================================
+  const onRightChain = () => PREVIEW || state.chainId === NET.chainId;
+
+  function renderWallet() {
+    const slot = $('wallet-slot');
+    if (PROOF_MODE) return slot.replaceChildren();
+    if (!eth() && !PREVIEW) {
+      return slot.replaceChildren(h('a', { class: 'btn outline', href: 'https://metamask.io/download/', target: '_blank', rel: 'noopener' }, icon('wallet'), 'Install MetaMask'));
+    }
+    if (!state.account) {
+      return slot.replaceChildren(h('button', { class: 'btn primary', type: 'button', onclick: connect }, icon('wallet'), 'Connect wallet'));
+    }
+    if (!onRightChain()) {
+      return slot.replaceChildren(h('button', { class: 'btn warn', type: 'button', onclick: switchChain }, `Switch to ${NET.name}`));
+    }
+    slot.replaceChildren(h('a', { class: 'btn outline', href: '#/profile', title: state.account }, h('span', { class: 'wallet-dot' }), short(state.account)));
+  }
+
+  async function ensureChain() {
+    if (PREVIEW || !eth()) return;
+    if (Number(await eth().request({ method: 'eth_chainId' })) !== NET.chainId) {
+      try {
+        await eth().request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_HEX }] });
+      } catch (e) {
+        const unknownChain = e.code === 4902 || e?.data?.originalError?.code === 4902 || /unrecognized chain/i.test(e.message || '');
+        if (!unknownChain) throw e;
+        await eth().request({
+          method: 'wallet_addEthereumChain',
+          params: [{ chainId: CHAIN_HEX, chainName: NET.name, nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: [NET.rpc], blockExplorerUrls: NET.explorer ? [NET.explorer] : [] }],
+        });
+      }
+    }
+    state.chainId = Number(await eth().request({ method: 'eth_chainId' }));
+    renderWallet();
+    if (!onRightChain()) throw Object.assign(new Error('Wrong network'), { code: 'WRONG_NETWORK' });
+  }
+
+  async function switchChain() {
+    try { await ensureChain(); } catch (e) { toast('Network not switched', e.code === 4001 ? 'You closed the MetaMask request.' : errorText(e, `Switch MetaMask to ${NET.name} and try again.`)); }
+  }
+
+  function setAccount(account) {
+    const changed = (account || '').toLowerCase() !== (state.account || '').toLowerCase();
+    state.account = account;
+    renderWallet();
+    if (!changed) return;
+    state.projects = null;
+    state.shown = PAGE_SIZE;
+    if (PROOF_MODE) return;
+    if (account) loadProjects(); else render();
+  }
+
+  // Returns true once a wallet is connected (and, on-chain, switched to the right network).
+  async function connect() {
+    if (!eth()) {
+      if (!PREVIEW) { toast('MetaMask needed', 'Install the MetaMask wallet to stamp milestones on BOT Chain.', { label: 'Install MetaMask', href: 'https://metamask.io/download/' }); return false; }
+      storage('ff.demo', '1');
+      setAccount(DEMO_ACCOUNT); // preview without a wallet: a demo address stands in
+      return true;
+    }
+    try {
+      const accounts = await eth().request({ method: 'eth_requestAccounts' });
+      watchWallet();
+      state.chainId = Number(await eth().request({ method: 'eth_chainId' }));
+      setAccount(accounts[0] ? ethers.getAddress(accounts[0]) : null);
+      await ensureChain();
+      return !!state.account;
+    } catch (e) {
+      toast(e.code === 'WRONG_NETWORK' ? 'Wrong network' : 'Wallet not connected', e.code === 4001 ? 'You closed the MetaMask request.' : errorText(e, 'MetaMask could not connect. Please try again.'));
+      return false;
+    }
+  }
+
+  let watching = false;
+  function watchWallet() {
+    if (watching || !eth()?.on) return;
+    watching = true;
+    eth().on('accountsChanged', (accounts) => setAccount(accounts[0] ? ethers.getAddress(accounts[0]) : null));
+    eth().on('chainChanged', (chainId) => { state.chainId = Number(chainId); renderWallet(); render(); });
+  }
+
+  async function initWallet() {
+    renderWallet();
+    if (PROOF_MODE) return;
+    if (!eth()) {
+      if (PREVIEW && storage('ff.demo')) setAccount(DEMO_ACCOUNT);
+      return;
+    }
+    watchWallet();
+    try {
+      state.chainId = Number(await eth().request({ method: 'eth_chainId' }));
+      const accounts = await eth().request({ method: 'eth_accounts' });
+      setAccount(accounts[0] ? ethers.getAddress(accounts[0]) : null);
+    } catch (e) { console.error(e); }
+    renderWallet();
+  }
+
+  // ============================================================
+  // Loading projects and their completion transactions
+  // ============================================================
+  async function loadProjects() {
+    const request = ++state.request;
+    const account = state.account;
+    state.loading = true;
+    state.loadError = false;
+    render();
+    try {
+      const ids = await store.idsOf(account);
+      const projects = (await Promise.all(ids.map((id) => store.get(id)))).filter(Boolean);
+      if (request !== state.request) return;
+      state.projects = projects;
+    } catch (e) {
+      console.error(e);
+      if (request !== state.request) return;
+      state.loadError = true;
+    }
+    state.loading = false;
+    render();
+  }
+
+  const txCacheKey = () => `ff.tx.${NET.chainId}.${NET.contract.toLowerCase()}`;
+  function rememberTx(projectId, index, hash) {
+    if (!hash) return;
+    (state.txs[projectId] ||= {})[index] = hash;
+    let cache = {};
+    try { cache = JSON.parse(storage(txCacheKey())) || {}; } catch { /* start fresh */ }
+    cache[`${projectId}:${index}`] = hash;
+    storage(txCacheKey(), JSON.stringify(cache));
+  }
+  const txLookups = new Set();
+  async function loadTxs(project) {
+    if (PREVIEW) return;
+    const known = (state.txs[project.id] ||= {});
+    try {
+      const cache = JSON.parse(storage(txCacheKey())) || {};
+      project.milestones.forEach((_, i) => { if (cache[`${project.id}:${i}`]) known[i] = cache[`${project.id}:${i}`]; });
+    } catch { /* no cache */ }
+    const missing = project.milestones.some((m, i) => m.completedAt && !known[i]);
+    const lookup = `${project.id}:${project.done}`;
+    if (!missing || txLookups.has(lookup)) return;
+    txLookups.add(lookup);
+    try {
+      const found = await store.txHashes(project.id);
+      for (const [index, hash] of Object.entries(found)) rememberTx(project.id, index, hash);
+      if (state.detail?.id === project.id) render();
+    } catch (e) { console.error(e); } // links are a nicety: the page works without them
+  }
+
+  // ============================================================
+  // Shared pieces
+  // ============================================================
+  function progressBar(p) {
+    const bar = h('div', { class: 'bar' + (isDone(p) ? ' done' : ''), role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(p.total), 'aria-valuenow': String(p.done) }, h('i'));
+    bar.firstChild.style.width = `${(p.done / p.total) * 100}%`;
+    return bar;
+  }
+  const statusPill = (p) => (isDone(p)
+    ? h('span', { class: 'pill done' }, icon('sparkle', 14), 'Completed')
+    : h('span', { class: 'pill' }, icon('sparkle', 14), 'In progress'));
+
+  function dueMeta(p) {
+    if (isDone(p)) return h('span', {}, `Completed ${fmtStamp(lastStamp(p))}`);
+    const next = nextDue(p);
+    return isOverdue(next) ? h('span', { class: 'red' }, `Overdue · ${fmtDue(next.dueDate)}`) : h('span', {}, `Next due ${fmtDue(next.dueDate)}`);
+  }
+
+  function empty({ iconName, title, text, action }) {
+    return h('div', { class: 'empty' }, h('div', { class: 'bubble' }, icon(iconName, 24)), h('h2', {}, title), text && h('p', {}, text), action);
+  }
+  const connectAction = () => (!eth() && !PREVIEW
+    ? h('a', { class: 'btn primary', href: 'https://metamask.io/download/', target: '_blank', rel: 'noopener' }, 'Install MetaMask')
+    : h('button', { class: 'btn primary', type: 'button', onclick: connect }, icon('wallet'), 'Connect wallet'));
+  const newProjectButton = () => h('button', { class: 'btn primary', type: 'button', onclick: openNewProject }, icon('plus'), 'New project');
+
+  function dropdown({ iconName, label, options, value, fallback, onPick }) {
+    const menu = h('ul', { class: 'menu', role: 'menu', hidden: true });
+    const button = h('button', { class: 'btn outline', type: 'button', 'aria-haspopup': 'menu', 'aria-expanded': 'false' },
+      icon(iconName, 16), label, value !== fallback && h('span', { class: 'dot' }), icon('chevron', 16));
+    const close = () => { menu.hidden = true; button.setAttribute('aria-expanded', 'false'); document.removeEventListener('click', outside); };
+    const outside = (e) => { if (!wrap.contains(e.target)) close(); };
+    button.addEventListener('click', () => {
+      if (!menu.hidden) return close();
+      menu.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+      setTimeout(() => document.addEventListener('click', outside));
+    });
+    for (const [key, text] of options) {
+      menu.append(h('li', { role: 'none' }, h('button', { type: 'button', role: 'menuitemradio', 'aria-checked': String(key === value), onclick: () => { close(); onPick(key); } }, text, key === value && icon('check', 16))));
+    }
+    const wrap = h('div', { class: 'dd', onkeydown: (e) => { if (e.key === 'Escape') { close(); button.focus(); } } }, button, menu);
+    return wrap;
+  }
+
+  // ============================================================
+  // View: My projects
+  // ============================================================
+  const SORTS = [['newest', 'Newest first'], ['oldest', 'Oldest first'], ['due', 'Next due date'], ['progress', 'Most progress']];
+  const FILTERS = [['all', 'All projects'], ['overdue', 'Overdue'], ['week', 'Due in the next 7 days']];
+
+  function visibleProjects() {
+    const q = state.q.trim().toLowerCase();
+    const list = state.projects.filter((p) => {
+      if (state.tab !== 'all' && (state.tab === 'completed') !== isDone(p)) return false;
+      if (q && !`${p.title} ${p.client}`.toLowerCase().includes(q)) return false;
+      if (state.filter === 'overdue') return hasOverdue(p);
+      if (state.filter === 'week') { const next = nextDue(p); return !!next && !isOverdue(next) && next.dueDate <= now() + 7 * DAY; }
+      return true;
+    });
+    const dueKey = (p) => nextDue(p)?.dueDate ?? Infinity;
+    const compare = {
+      newest: (a, b) => b.id - a.id,
+      oldest: (a, b) => a.id - b.id,
+      due: (a, b) => (dueKey(a) === dueKey(b) ? b.id - a.id : dueKey(a) < dueKey(b) ? -1 : 1),
+      progress: (a, b) => b.done / b.total - a.done / a.total || b.id - a.id,
+    }[state.sort];
+    return list.sort(compare);
+  }
+
+  function projectCard(p) {
+    return h('a', { class: 'card', href: `#/project/${p.id}` },
+      h('h3', {}, p.title),
+      h('p', { class: 'client' }, p.client),
+      h('div', { class: 'progress-line' }, h('span', {}, `${p.done} / ${p.total} milestones`), progressBar(p)),
+      h('div', { class: 'card-foot' }, statusPill(p), dueMeta(p)));
+  }
+
+  function projectTabs() {
+    const count = (tab) => state.projects.filter((p) => tab === 'all' || (tab === 'completed') === isDone(p)).length;
+    return [['active', 'Active'], ['completed', 'Completed'], ['all', 'All']].map(([key, label]) =>
+      h('button', { class: 'tab' + (state.tab === key ? ' active' : ''), type: 'button', role: 'tab', 'aria-selected': String(state.tab === key), onclick: () => { state.tab = key; state.shown = PAGE_SIZE; refreshProjects(); } },
+        label, h('span', { class: 'count' }, String(count(key)))));
+  }
+
+  function projectResults() {
+    if (!state.account) {
+      return empty({
+        iconName: 'wallet', title: 'Connect your wallet to see your projects',
+        text: !eth() && !PREVIEW
+          ? 'Freelance Flow uses the MetaMask wallet to stamp milestones on BOT Chain. Client links still open without a wallet.'
+          : 'Your projects are tied to your wallet address. Client links still open without a wallet.',
+        action: connectAction(),
+      });
+    }
+    if (state.loadError) {
+      return empty({ iconName: 'clock', title: 'Projects could not be loaded', text: `${NET.name} did not respond. Check your connection and try again.`, action: h('button', { class: 'btn outline', type: 'button', onclick: loadProjects }, 'Try again') });
+    }
+    if (state.loading || !state.projects) return h('div', { class: 'list' }, h('div', { class: 'skeleton' }), h('div', { class: 'skeleton' }));
+    if (!state.projects.length) {
+      return empty({ iconName: 'folder', title: 'No projects yet', text: 'Create your first project, add its milestones, and stamp each one on BOT Chain as you finish it.', action: newProjectButton() });
+    }
+
+    const list = visibleProjects();
+    if (!list.length) {
+      const filtered = state.q.trim() || state.filter !== 'all';
+      return empty(filtered
+        ? { iconName: 'search', title: 'No projects match', text: 'Try a different search or clear the filter.', action: h('button', { class: 'btn outline', type: 'button', onclick: () => { state.q = ''; state.filter = 'all'; render(); } }, 'Clear search and filter') }
+        : state.tab === 'completed'
+          ? { iconName: 'checkCircle', title: 'No completed projects yet', text: 'A project moves here once every milestone is stamped.' }
+          : { iconName: 'sparkle', title: 'Nothing in progress', text: 'Every project is complete. Start a new one when the next client calls.', action: newProjectButton() });
+    }
+    return h('div', {}, h('div', { class: 'list' }, list.slice(0, state.shown).map(projectCard)),
+      list.length > state.shown && h('div', { class: 'more' }, h('button', { class: 'btn outline', type: 'button', onclick: () => { state.shown += PAGE_SIZE; refreshProjects(); } }, `Load more (${list.length - state.shown} left)`)));
+  }
+
+  // Re-renders tabs and results only, so the search box keeps focus while typing.
+  function refreshProjects() {
+    $('projects-tabs')?.replaceChildren(...projectTabs());
+    $('projects-body')?.replaceChildren(projectResults());
+  }
+
+  function viewProjects() {
+    const hasProjects = !!state.account && !!state.projects?.length;
+    const search = h('input', { type: 'search', placeholder: 'Search projects or clients', 'aria-label': 'Search projects', value: state.q, oninput: (e) => { state.q = e.target.value; state.shown = PAGE_SIZE; refreshProjects(); } });
+    return [
+      h('div', { class: 'head' }, h('h1', {}, 'My projects'), hasProjects && h('button', { class: 'btn primary', type: 'button', onclick: openNewProject }, icon('plus'), 'New', h('span', { class: 'long' }, ' project'))),
+      hasProjects && h('div', { class: 'tabs', role: 'tablist', id: 'projects-tabs' }, projectTabs()),
+      hasProjects && h('div', { class: 'search' }, icon('search'), search),
+      hasProjects && h('div', { class: 'controls' },
+        dropdown({ iconName: 'sort', label: 'Sort', options: SORTS, value: state.sort, fallback: 'newest', onPick: (key) => { state.sort = key; render(); } }),
+        dropdown({ iconName: 'filter', label: 'Filter', options: FILTERS, value: state.filter, fallback: 'all', onPick: (key) => { state.filter = key; state.shown = PAGE_SIZE; render(); } })),
+      h('div', { id: 'projects-body' }, projectResults()),
+    ];
+  }
+
+  // ============================================================
+  // Views: project detail (owner) and client proof page
+  // ============================================================
+  async function openDetail(id) {
+    if (state.detail?.id === id && state.detail.status === 'ready') return loadTxs(state.detail.project);
+    const cached = state.projects?.find((p) => p.id === id);
+    state.detail = cached ? { id, status: 'ready', project: cached } : { id, status: 'loading' };
+    state.rowError = null;
+    if (cached) return loadTxs(cached);
+    try {
+      const project = await store.get(id);
+      if (state.detail?.id !== id) return;
+      state.detail = project ? { id, status: 'ready', project } : { id, status: 'missing' };
+      if (project) loadTxs(project);
+    } catch (e) {
+      console.error(e);
+      if (state.detail?.id !== id) return;
+      state.detail = { id, status: 'error' };
+    }
+    render();
+  }
+
+  function detailFallback(retry) {
+    const d = state.detail;
+    if (d.status === 'loading') return h('div', { class: 'list' }, h('div', { class: 'skeleton' }), h('div', { class: 'skeleton' }));
+    if (d.status === 'error') {
+      return empty({ iconName: 'clock', title: 'This project could not be loaded', text: `${NET.name} did not respond. Check your connection and try again.`, action: h('button', { class: 'btn outline', type: 'button', onclick: retry }, 'Try again') });
+    }
+    return empty({
+      iconName: 'search', title: 'Project not found',
+      text: PREVIEW ? 'Preview projects are saved in the browser that created them, so this link only opens there.' : 'There is no project with this ID. Check the link and try again.',
+      action: h('a', { class: 'btn outline', href: url() }, 'Go to Freelance Flow'),
+    });
+  }
+
+  function milestoneRow(p, m, index, { canComplete, proof }) {
+    const key = `${p.id}:${index}`;
+    const overdue = isOverdue(m);
+    const tx = txUrl(state.txs[p.id]?.[index]);
+    const info = h('div', { class: 'info' }, h('span', {}, `Due ${fmtDue(m.dueDate)}`));
+    if (m.completedAt) {
+      info.append(h('span', { title: fmtStampFull(m.completedAt) }, `Completed ${fmtStamp(m.completedAt)}`));
+      if (tx && !proof) info.append(h('a', { class: 'link', href: tx, target: '_blank', rel: 'noopener' }, 'View transaction'));
+    } else if (overdue) {
+      info.append(h('span', { class: 'red' }, 'Overdue'));
+    }
+
+    let act = null;
+    if (m.completedAt && proof) {
+      const verifyUrl = tx || (NET.contract && addressUrl(NET.contract));
+      act = PREVIEW
+        ? h('span', { class: 'pill muted' }, 'Preview · not on-chain')
+        : h(verifyUrl ? 'a' : 'span', { class: 'pill done', href: verifyUrl, target: '_blank', rel: 'noopener', title: tx ? 'View the transaction' : 'View the contract' }, icon('shield', 14), `Verified on ${NET.name}`);
+    } else if (m.completedAt) {
+      act = h('span', { class: 'green' }, '✓ Done');
+    } else if (canComplete) {
+      const busy = state.busy === key;
+      act = h('button', { class: 'btn outline sm', type: 'button', disabled: !!state.busy, onclick: () => completeMilestone(p, index) }, state.rowError?.key === key ? 'Retry' : 'Mark complete');
+      if (busy) setBusy(act, 'Stamping on BOT Chain…');
+    } else if (proof) {
+      act = h('span', { class: 'pill muted' }, overdue ? 'Overdue' : 'Open');
+    }
+
+    return h('li', { class: 'ms' + (m.completedAt ? ' done' : overdue ? ' overdue' : '') },
+      h('span', { class: 'state' }, icon(m.completedAt ? 'checkCircle' : overdue ? 'clock' : 'circle', 22)),
+      h('div', {}, h('div', { class: 'title' }, m.title), info),
+      act && h('div', { class: 'act' }, act),
+      state.rowError?.key === key && h('p', { class: 'row-error', role: 'alert' }, state.rowError.text));
+  }
+
+  function summary(p) {
+    return h('div', { class: 'summary' },
+      h('div', { class: 'summary-top' }, h('strong', {}, `${p.done} of ${p.total} milestones completed`), statusPill(p)),
+      progressBar(p));
+  }
+
+  async function completeMilestone(p, index) {
+    const key = `${p.id}:${index}`;
+    state.busy = key;
+    state.rowError = null;
+    render();
+    try {
+      if (!sameAddress(state.account, p.owner)) throw Object.assign(new Error('Not owner'), { revert: { name: 'NotOwner' } });
+      await ensureChain();
+      const { hash, completedAt } = await store.complete(p.id, index);
+      p.milestones[index].completedAt = completedAt;
+      p.done = p.milestones.filter((m) => m.completedAt).length;
+      state.projects = state.projects?.map((listed) => (listed.id === p.id ? p : listed)) ?? null;
+      rememberTx(p.id, index, hash);
+      toast(isDone(p) ? 'Project completed 🎉' : 'Milestone stamped', `“${p.milestones[index].title}” is now verifiable by your client.`, txUrl(hash) && { label: 'View transaction', href: txUrl(hash) });
+    } catch (e) {
+      state.rowError = { key, text: errorText(e) };
+    }
+    state.busy = null;
+    render();
+  }
+
+  function copyLinkButton(p, cls = 'btn primary') {
+    const button = h('button', { class: cls, type: 'button', onclick: async () => {
+      await copyText(proofUrl(p.id));
+      button.replaceChildren(icon('check', 16), 'Link copied');
+      setTimeout(() => button.replaceChildren(icon('link', 16), 'Copy client link'), 2000);
+    } }, icon('link', 16), 'Copy client link');
+    return button;
+  }
+
+  function viewDetail() {
+    const d = state.detail;
+    const back = h('a', { class: 'back', href: '#/projects' }, icon('arrowLeft', 16), 'My projects');
+    if (d.status !== 'ready') return [back, detailFallback(() => { state.detail = null; route(); })];
+    const p = d.project;
+    const mine = sameAddress(state.account, p.owner);
+    const canComplete = mine && onRightChain();
+    return [
+      back,
+      h('div', { class: 'detail-head' }, h('h1', {}, p.title), h('div', { class: 'meta' }, h('span', {}, p.client), h('span', {}, `Created ${fmtStamp(p.createdAt)}`))),
+      summary(p),
+      h('div', { class: 'actions' }, copyLinkButton(p), h('a', { class: 'btn outline', href: url({ project: p.id }), target: '_blank', rel: 'noopener' }, 'Open client page', icon('external', 16))),
+      h('h2', { class: 'section-title' }, 'Milestones'),
+      h('ul', { class: 'milestones' }, p.milestones.map((m, i) => milestoneRow(p, m, i, { canComplete, proof: false }))),
+      !isDone(p) && !mine && h('p', { class: 'note' }, state.account
+        ? `Only the wallet that created this project (${short(p.owner)}) can complete its milestones.`
+        : 'Connect the wallet that created this project to complete its milestones.'),
+      !isDone(p) && mine && !canComplete && h('p', { class: 'note red' }, `Switch MetaMask to ${NET.name} to complete milestones.`),
+    ];
+  }
+
+  function viewProof() {
+    const d = state.detail;
+    if (d.status !== 'ready') return [detailFallback(() => location.reload())];
+    const p = d.project;
+    document.title = `${p.title} · progress verified on BOT Chain`;
+    const owner = addressUrl(p.owner);
+    return [
+      h('div', { class: 'detail-head' },
+        h('div', { class: 'eyebrow' }, icon('shield', 16), 'Progress report'),
+        h('h1', {}, p.title),
+        h('div', { class: 'meta' },
+          h('span', {}, `Client: ${p.client}`),
+          h('span', {}, 'Freelancer: ', owner ? h('a', { class: 'link', href: owner, target: '_blank', rel: 'noopener', title: p.owner }, short(p.owner)) : short(p.owner)),
+          h('span', {}, `Created ${fmtStamp(p.createdAt)}`))),
+      summary(p),
+      h('h2', { class: 'section-title' }, 'Milestones'),
+      h('ul', { class: 'milestones' }, p.milestones.map((m, i) => milestoneRow(p, m, i, { canComplete: false, proof: true }))),
+      h('p', { class: 'note' }, PREVIEW
+        ? 'Preview mode: this project is saved in this browser only and is not on BOT Chain yet.'
+        : `Completion dates are block timestamps recorded by the Freelance Flow contract on ${NET.name}. They can't be edited or backdated, and only the freelancer's wallet can mark a milestone complete.`),
+      h('p', { class: 'note' }, 'Are you the freelancer? ', h('a', { class: 'link', href: url({ hash: `#/project/${p.id}` }) }, 'Manage this project')),
+    ];
+  }
+
+  // ============================================================
+  // Views: Proof tab and Profile
+  // ============================================================
+  function viewProofTab() {
+    const input = h('input', { type: 'text', inputmode: 'numeric', placeholder: 'Project ID or client link', 'aria-label': 'Project ID or client link' });
+    const lookup = h('form', { class: 'inline-form', onsubmit: (e) => {
+      e.preventDefault();
+      const match = input.value.trim().match(/(?:project=)?(\d+)\s*$/);
+      if (!match) return toast('Enter a project ID', 'Paste a client link or type the number at the end of it.');
+      location.href = url({ project: Number(match[1]) });
+    } }, input, h('button', { class: 'btn outline', type: 'submit' }, 'View'));
+
+    let mine;
+    if (!state.account) mine = h('p', {}, 'Connect your wallet to list your own projects here.');
+    else if (state.loadError) mine = h('p', {}, 'Your projects could not be loaded. ', h('button', { class: 'btn ghost sm', type: 'button', onclick: loadProjects }, 'Try again'));
+    else if (!state.projects) mine = h('p', {}, 'Loading your projects…');
+    else if (!state.projects.length) mine = h('p', {}, 'You have no projects yet. Create one to get a link to share.');
+    else {
+      mine = h('div', { style: 'margin-top:6px' }, [...state.projects].sort((a, b) => b.id - a.id).map((p) => h('div', { class: 'share-row' },
+        h('div', { class: 'who' }, h('b', {}, p.title), h('span', {}, `${p.client} · ${p.done} / ${p.total} milestones`)),
+        h('div', { class: 'btns' }, copyLinkButton(p, 'btn outline sm'), h('a', { class: 'btn ghost sm', href: url({ project: p.id }), target: '_blank', rel: 'noopener' }, 'Open', icon('external', 14))))));
+    }
+    return [
+      h('div', { class: 'head' }, h('div', {}, h('h1', {}, 'Proof'), h('p', { class: 'sub' }, 'Every project has a public page your client can open without a wallet.'))),
+      h('div', { class: 'panel' }, h('h2', {}, 'Share your progress'), mine),
+      h('div', { class: 'panel' }, h('h2', {}, 'Check a project'), h('p', {}, 'Open any project by its ID to see which milestones are verified.'), lookup),
+    ];
+  }
+
+  function viewProfile() {
+    const head = h('div', { class: 'head' }, h('h1', {}, 'Profile'));
+    if (!state.account) {
+      return [head, empty({ iconName: 'user', title: 'No wallet connected', text: 'Your wallet address is your Freelance Flow account. There is nothing else to sign up for.', action: connectAction() })];
+    }
+    const projects = state.projects || [];
+    const stamped = projects.reduce((n, p) => n + p.done, 0);
+    const overdue = projects.reduce((n, p) => n + p.milestones.filter(isOverdue).length, 0);
+    const copy = h('button', { class: 'btn ghost sm', type: 'button', onclick: async () => { await copyText(state.account); toast('Address copied'); } }, 'Copy');
+    const explorerLink = (href, text) => (href ? h('a', { class: 'link', href, target: '_blank', rel: 'noopener' }, text) : text);
+    return [
+      head,
+      h('div', { class: 'stats' },
+        h('div', { class: 'stat' }, h('b', {}, state.projects ? String(projects.length) : '–'), h('span', {}, 'Projects')),
+        h('div', { class: 'stat' }, h('b', {}, state.projects ? String(stamped) : '–'), h('span', {}, 'Milestones stamped')),
+        h('div', { class: 'stat' }, h('b', { class: overdue ? 'red' : '' }, state.projects ? String(overdue) : '–'), h('span', {}, 'Overdue'))),
+      h('div', { class: 'panel' },
+        h('h2', {}, 'Wallet'),
+        h('dl', { class: 'kv' },
+          h('dt', {}, 'Address'), h('dd', {}, explorerLink(addressUrl(state.account), state.account), ' ', copy),
+          h('dt', {}, 'Network'), h('dd', {}, onRightChain() ? `${NET.name} (chain ID ${NET.chainId})` : h('span', { class: 'red' }, `Wrong network. Switch to ${NET.name}.`)),
+          h('dt', {}, 'Contract'), h('dd', {}, PREVIEW ? 'Not deployed yet (preview mode)' : explorerLink(addressUrl(NET.contract), NET.contract)))),
+      !eth() && PREVIEW && h('p', { class: 'note' }, 'This is a demo address. With MetaMask installed, your own wallet is used.'),
+    ];
+  }
+
+  // ============================================================
+  // View: landing page
+  // ============================================================
+  // Stampy, the mascot: a rubber stamp with a face. The favicon and the header mark are the same character.
+  const MASCOT = '<svg viewBox="0 0 120 118" aria-hidden="true"><g class="m-hop">'
+    + '<path class="m-arm" d="M28 70Q11 62 13 44" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>'
+    + '<path d="M92 72Q106 78 105 92" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>'
+    + '<rect x="52" y="26" width="16" height="22" rx="6" fill="#fff"/><circle cx="60" cy="20" r="14" fill="#fff"/>'
+    + '<rect x="24" y="42" width="72" height="62" rx="26" fill="#fff"/><rect x="14" y="98" width="92" height="18" rx="9" fill="#FFD166"/>'
+    + '<ellipse class="m-eye" cx="46" cy="68" rx="5" ry="6" fill="#111827"/><ellipse class="m-eye" cx="74" cy="68" rx="5" ry="6" fill="#111827"/>'
+    + '<circle cx="48" cy="65.5" r="1.8" fill="#fff"/><circle cx="76" cy="65.5" r="1.8" fill="#fff"/>'
+    + '<ellipse cx="37" cy="80" rx="6" ry="3.5" fill="#FF9DB5"/><ellipse cx="83" cy="80" rx="6" ry="3.5" fill="#FF9DB5"/>'
+    + '<path d="M52 78Q60 86 68 78" fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round"/></g></svg>';
+  function mascot(cls) {
+    const el = h('div', { class: 'mascot ' + cls, 'aria-hidden': 'true' });
+    el.innerHTML = MASCOT;
+    el.addEventListener('animationend', (e) => { if (e.animationName === 'hop') el.classList.remove('hop'); });
+    return el;
+  }
+
+  let demoTimer = 0;
+  function stopDemo() { clearTimeout(demoTimer); }
+
+  // Plays the product's core loop on a sample card: each milestone is stamped, then verified.
+  function startDemo(card) {
+    const rows = [...card.querySelectorAll('.demo-ms')];
+    const pill = card.querySelector('.demo-status');
+    const stampy = card.querySelector('.mascot');
+    const show = (done, busy) => {
+      if (busy >= 0) stampy.classList.add('hop'); // Stampy jumps and lands as the milestone is stamped
+      rows.forEach((row, i) => { row.classList.toggle('done', i < done); row.classList.toggle('busy', i === busy); });
+      card.querySelector('.demo-count').textContent = `${done} / ${rows.length} milestones`;
+      const bar = card.querySelector('.bar');
+      bar.classList.toggle('done', done === rows.length);
+      bar.firstChild.style.width = `${(done / rows.length) * 100}%`;
+      pill.className = 'pill demo-status' + (done === rows.length ? ' done' : '');
+      pill.lastChild.textContent = done === rows.length ? 'Completed' : 'In progress';
+    };
+    stopDemo();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return show(2, -1);
+    const frames = [[0, -1, 1200], [0, 0, 1200], [1, -1, 900], [1, 1, 1200], [2, -1, 900], [2, 2, 1200], [3, -1, 3200]]; // done, stamping, ms
+    let frame = 0;
+    const tick = () => {
+      const [done, busy, ms] = frames[frame];
+      show(done, busy);
+      frame = (frame + 1) % frames.length;
+      demoTimer = setTimeout(tick, ms);
+    };
+    tick();
+  }
+
+  function viewLanding() {
+    const launch = (label, cls = 'btn white lg') => h('a', { class: cls, href: '#/projects' }, label);
+    const rise = (d, el) => { el.classList.add('rise'); el.style.setProperty('--d', d); return el; };
+    const cursor = (name, color, style) => {
+      const el = h('div', { class: 'cursor', style: `--c:${color};${style}`, 'aria-hidden': 'true' });
+      el.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 3l15 7-6.5 2L10 19z" style="fill:var(--c)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+      el.append(h('b', {}, name));
+      return el;
+    };
+    const verified = (i) => h('span', { class: 'pill done', style: `--i:${i}` }, icon('shield', 14), 'Verified');
+
+    // ---- hero
+    const float = (cls, ...kids) => h('div', { class: 'fl ' + cls, 'aria-hidden': 'true' }, ...kids);
+    const stampy = mascot('fl stampy loop');
+    const hero = h('section', { class: 'hero' },
+      stampy,
+      float('orb', icon('check', 38)),
+      float('disc', icon('link', 36)),
+      float('vbadge', icon('shield', 24), 'Verified'),
+      float('note', h('small', {}, 'Due'), h('b', {}, 'Oct 19'), icon('checkCircle', 26)),
+      float('mini',
+        h('div', {}, icon('checkCircle', 16), 'Moodboard'), h('div', {}, icon('checkCircle', 16), 'Logo concepts'), h('div', {}, icon('circle', 16), 'Final files'),
+        (() => { const bar = h('div', { class: 'bar' }, h('i')); bar.firstChild.style.width = '66%'; return bar; })()),
+      h('div', { class: 'hero-copy' },
+        rise(0, h('h1', {}, 'What will you finish today?')),
+        rise(1, h('p', { class: 'hero-sub' }, 'Stamp every milestone on BOT Chain, then send your client one link to verify it.')),
+        rise(2, launch('Start stamping'))),
+      h('button', { class: 'scroll-pill', type: 'button', onclick: () => $('tools').scrollIntoView({ behavior: 'smooth' }) }, 'Scroll to explore', icon('arrowDown', 18)));
+    hero.addEventListener('pointermove', (e) => {
+      const box = hero.getBoundingClientRect();
+      hero.style.setProperty('--mx', (((e.clientX - box.left) / box.width) * 2 - 1).toFixed(3));
+      hero.style.setProperty('--my', (((e.clientY - box.top) / box.height) * 2 - 1).toFixed(3));
+    });
+
+    // ---- tools: one colourful panel per step, with a sticky tab bar that follows the scroll
+    const createArt = h('div', { class: 'art' },
+      h('div', { class: 'mock' },
+        h('h4', {}, 'New project'),
+        h('div', { class: 'fld' }, h('small', {}, 'Project title'), 'Brand identity refresh'),
+        h('div', { class: 'fld' }, h('small', {}, 'Client'), 'Studio Nara'),
+        [['Moodboard', 'Oct 5'], ['Logo concepts', 'Oct 19'], ['Final files', 'Nov 2']].map(([title, due], i) =>
+          h('div', { class: 'mrow', style: `--i:${i}` }, h('span', {}, title), h('span', {}, due))),
+        h('div', { class: 'fake-btn' }, 'Create on BOT Chain')),
+      cursor('You', '#7C3AED', 'right:8%;bottom:6%'));
+
+    const demoRow = (title, due) => h('div', { class: 'demo-ms' },
+      h('span', { class: 'st' }, h('span', { class: 'o' }, icon('circle', 20)), h('span', { class: 'spin' }), h('span', { class: 'ok' }, icon('checkCircle', 20))),
+      h('div', {}, h('div', {}, title), h('div', { class: 'due' }, due)),
+      h('span', { class: 'tag' },
+        h('span', { class: 't-open' }, 'Mark complete'),
+        h('span', { class: 't-busy' }, 'Stamping…'),
+        h('span', { class: 'pill done t-done' }, icon('shield', 14), 'Verified')));
+    const demo = h('div', { class: 'demo' },
+      mascot('perch'),
+      h('div', { class: 'demo-top' },
+        h('div', {}, h('h4', {}, 'Brand identity refresh'), h('p', { class: 'client' }, 'Studio Nara')),
+        h('span', { class: 'pill demo-status' }, icon('sparkle', 14), 'In progress')),
+      h('div', { class: 'progress-line' }, h('span', { class: 'demo-count' }, '0 / 3 milestones'), h('div', { class: 'bar' }, h('i'))),
+      h('div', { class: 'demo-list' }, demoRow('Moodboard', 'Due Oct 5'), demoRow('Logo concepts', 'Due Oct 19'), demoRow('Final files', 'Due Nov 2')));
+    const stampArt = h('div', { class: 'art', 'aria-hidden': 'true' }, demo);
+
+    const shareArt = h('div', { class: 'art', 'aria-hidden': 'true' },
+      h('div', { class: 'mock browser' },
+        h('div', { class: 'bbar' }, h('i'), h('i'), h('i'), h('div', { class: 'burl' }, h('span', {}, 'your-site.com/?project=12'))),
+        h('div', { class: 'bbody' },
+          h('div', { class: 'eyebrow' }, icon('shield', 13), 'Progress report'),
+          h('h4', {}, 'Brand identity refresh'),
+          h('div', { class: 'progress-line' }, h('span', {}, '2 of 3 completed'), (() => { const bar = h('div', { class: 'bar' }, h('i')); bar.firstChild.style.width = '66%'; return bar; })()),
+          h('div', { class: 'vrow', style: 'margin-top:14px' }, icon('checkCircle', 20), h('div', {}, 'Moodboard'), verified(0)),
+          h('div', { class: 'vrow' }, icon('checkCircle', 20), h('div', {}, 'Logo concepts'), verified(1)))),
+      cursor('Client', '#0EA5A4', 'right:4%;top:34%'));
+
+    const verifyArt = h('div', { class: 'art', 'aria-hidden': 'true' },
+      h('div', { class: 'mock' },
+        [['Moodboard', 'Stamped Oct 2 · 14:02'], ['Logo concepts', 'Stamped Oct 10 · 09:41'], ['Final files', 'Stamped Oct 13 · 17:26']].map(([title, when], i) =>
+          h('div', { class: 'vrow' }, icon('checkCircle', 20), h('div', {}, title, h('small', {}, when)), verified(i))),
+        h('div', { class: 'mock-foot' }, 'Times come from the block, not from you.')));
+
+    const TOOLS = [
+      { key: 'create', label: 'Create', iconName: 'plusSquare', title: 'Turn a brief into a plan that lives on-chain', text: 'Name the project and the client, then add up to ten milestones with due dates. One transaction puts the plan on BOT Chain.', cta: 'Create a project', art: createArt },
+      { key: 'stamp', label: 'Stamp', iconName: 'checkCircle', title: 'Stamp each milestone the moment it’s done', text: 'Mark it complete and the contract records the time. Only the wallet that created the project can do it, and only once.', cta: 'Start stamping', art: stampArt },
+      { key: 'share', label: 'Share', iconName: 'link', title: 'Share one link. Your client needs no wallet', text: 'Copy the client link and send it. It opens a read-only progress page that loads straight from the contract.', cta: 'Get your link', art: shareArt },
+      { key: 'verify', label: 'Verify', iconName: 'shield', title: 'Dates that can’t be backdated', text: 'Every completed milestone carries a verified badge and its block timestamp. Nobody can edit it afterwards, including you.', cta: 'Open the app', art: verifyArt },
+    ];
+    const panels = TOOLS.map((t) => h('article', { class: `tool reveal ${t.key}`, id: `tool-${t.key}` },
+      h('div', {}, h('h3', {}, t.title), h('p', {}, t.text), launch(t.cta)), t.art));
+    const tabs = TOOLS.map((t, i) => h('button', { class: 'tb' + (i ? '' : ' active'), type: 'button', onclick: () => panels[i].scrollIntoView({ behavior: 'smooth' }) }, icon(t.iconName, 20), t.label));
+    const tools = h('section', { class: 'sec', id: 'tools' },
+      h('h2', { class: 'reveal' }, 'Tools to prove your best work'),
+      h('div', { class: 'toolbar' }, tabs),
+      h('div', { class: 'tools' }, panels));
+
+    // ---- meet Stampy + closing
+    const suite = h('section', { class: 'sec' },
+      h('h2', { class: 'reveal' }, 'All the proof. All in one place.'),
+      h('div', { class: 'suite reveal' },
+        h('div', {}, h('h3', {}, 'Meet Stampy'),
+          h('p', {}, 'Stampy is the rubber stamp behind every tick. No sign-up, no subscription, and nothing in the contract but your progress. Your wallet is your account.'),
+          launch('Launch app')),
+        h('div', { class: 'suite-art', 'aria-hidden': 'true' }, mascot('loop'),
+          h('span', { class: 'chip c1' }, icon('check', 15), 'No tokens'),
+          h('span', { class: 'chip c2' }, icon('check', 15), 'No payments'),
+          h('span', { class: 'chip c3' }, icon('check', 15), 'No escrow'))));
+    const final = h('section', { class: 'final reveal' }, h('h2', {}, 'Start stamping with Freelance Flow'), launch('Get started', 'btn primary lg'));
+
+    const page = h('div', { class: 'landing-page' }, hero, tools, suite, final);
+    startDemo(demo);
+    const seen = new IntersectionObserver((entries) => {
+      for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('in'); seen.unobserve(entry.target); }
+    }, { rootMargin: '0px 0px -8% 0px' });
+    for (const el of page.querySelectorAll('.reveal')) seen.observe(el);
+    // The tab for whichever panel crosses the middle of the screen is the active one.
+    const spy = new IntersectionObserver((entries) => {
+      for (const entry of entries) if (entry.isIntersecting) tabs.forEach((tab, i) => tab.classList.toggle('active', panels[i] === entry.target));
+    }, { rootMargin: '-50% 0px -50% 0px' });
+    for (const panel of panels) spy.observe(panel);
+    return page;
+  }
+
+  // ============================================================
+  // New project dialog
+  // ============================================================
+  const dialog = $('new-dialog');
+  let creating = false;
+
+  function milestoneInputRow() {
+    const row = h('div', { class: 'ms-row' },
+      h('input', { type: 'text', maxlength: String(MAX_TITLE_BYTES), placeholder: 'Milestone title', 'aria-label': 'Milestone title', autocomplete: 'off' }),
+      h('input', { type: 'date', 'aria-label': 'Due date' }),
+      h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Remove milestone', onclick: () => { row.remove(); syncMilestoneRows(); } }, icon('x', 18)));
+    return row;
+  }
+  function syncMilestoneRows() {
+    const rows = [...$('np-rows').children];
+    rows.forEach((row) => { row.querySelector('button').disabled = rows.length === 1; });
+    $('np-add').hidden = rows.length >= MAX_MILESTONES;
+    $('np-count').textContent = `${rows.length} of ${MAX_MILESTONES}`;
+  }
+  function formError(text) {
+    $('np-error').hidden = !text;
+    $('np-error').textContent = text || '';
+  }
+  function resetSubmit() {
+    creating = false;
+    const submit = $('np-submit');
+    submit.disabled = false;
+    submit.classList.remove('busy');
+    $('np-cancel').disabled = false;
+  }
+
+  async function openNewProject() {
+    if (!state.account && !(await connect())) return;
+    if (dialog.open) return;
+    $('new-form').reset();
+    $('np-rows').replaceChildren(milestoneInputRow());
+    syncMilestoneRows();
+    formError('');
+    resetSubmit();
+    $('np-submit').textContent = 'Create on BOT Chain';
+    dialog.showModal();
+    $('np-title').focus();
+  }
+
+  function readNewProject() {
+    const title = $('np-title').value.trim();
+    const client = $('np-client').value.trim();
+    if (!title) return { error: 'Give the project a title.', focus: $('np-title') };
+    if (bytes(title) > MAX_TITLE_BYTES) return { error: 'The project title is too long (80 characters at most, fewer with accents or emoji).', focus: $('np-title') };
+    if (!client) return { error: 'Add a client name or initials.', focus: $('np-client') };
+    if (bytes(client) > MAX_CLIENT_BYTES) return { error: 'The client name is too long (60 characters at most, fewer with accents or emoji).', focus: $('np-client') };
+    const titles = [];
+    const dueDates = [];
+    for (const [i, row] of [...$('np-rows').children].entries()) {
+      const [name, date] = row.querySelectorAll('input');
+      const milestone = name.value.trim();
+      if (!milestone) return { error: `Give milestone ${i + 1} a title, or remove it.`, focus: name };
+      if (bytes(milestone) > MAX_TITLE_BYTES) return { error: `Milestone ${i + 1}'s title is too long (80 characters at most).`, focus: name };
+      const due = Date.parse(date.value + 'T00:00:00Z') / 1000;
+      if (!date.value || !Number.isFinite(due) || due <= 0) return { error: `Pick a due date for milestone ${i + 1}.`, focus: date };
+      titles.push(milestone);
+      dueDates.push(due);
+    }
+    return { title, client, titles, dueDates };
+  }
+
+  async function submitNewProject(e) {
+    e.preventDefault();
+    if (creating) return;
+    const input = readNewProject();
+    if (input.error) { formError(input.error); input.focus.focus(); return; }
+    formError('');
+    creating = true;
+    setBusy($('np-submit'), 'Stamping on BOT Chain…');
+    $('np-cancel').disabled = true;
+    try {
+      await ensureChain();
+      const { id, hash, createdAt } = await store.create(input.title, input.client, input.titles, input.dueDates);
+      const project = {
+        id, owner: state.account, title: input.title, client: input.client, createdAt, total: input.titles.length, done: 0,
+        milestones: input.titles.map((t, i) => ({ title: t, dueDate: input.dueDates[i], completedAt: 0 })),
+      };
+      (state.projects ||= []).push(project);
+      state.tab = 'active';
+      resetSubmit();
+      dialog.close();
+      toast('Project created', `“${input.title}” is on ${PREVIEW ? 'your board' : NET.name}. Mark milestones complete as you finish them.`, txUrl(hash) && { label: 'View transaction', href: txUrl(hash) });
+      if (location.hash === `#/project/${id}`) route(); else location.hash = `#/project/${id}`;
+    } catch (err) {
+      resetSubmit();
+      $('np-submit').textContent = 'Try again';
+      formError(errorText(err));
+    }
+  }
+
+  // ============================================================
+  // Routing and chrome
+  // ============================================================
+  function currentRoute() {
+    if (PROOF_MODE) return { name: 'proofPage', id: /^\d+$/.test(proofParam) ? Number(proofParam) : NaN };
+    if (location.hash.length < 2) return { name: 'landing' };
+    const hash = location.hash.replace(/^#\/?/, '');
+    const project = hash.match(/^project\/(\d+)$/);
+    if (project) return { name: 'detail', id: Number(project[1]) };
+    if (hash === 'proof' || hash === 'profile') return { name: hash };
+    return { name: 'projects' };
+  }
+
+  function render() {
+    const r = currentRoute();
+    document.body.classList.toggle('landing', r.name === 'landing');
+    if (r.name === 'landing') {
+      // Built once: wallet events re-render the app, and the page's animations shouldn't restart with them.
+      if (!$('view').querySelector('.landing-page')) $('view').replaceChildren(viewLanding());
+      return;
+    }
+    stopDemo();
+    const views = { projects: viewProjects, proof: viewProofTab, profile: viewProfile, detail: viewDetail, proofPage: viewProof };
+    if ((r.name === 'detail' || r.name === 'proofPage') && !state.detail) return;
+    $('view').replaceChildren(...views[r.name]().filter(Boolean));
+    const active = r.name === 'detail' ? 'projects' : r.name;
+    for (const item of document.querySelectorAll('.nav-item')) {
+      const on = item.dataset.nav === active;
+      item.classList.toggle('active', on);
+      if (on) item.setAttribute('aria-current', 'page'); else item.removeAttribute('aria-current');
+    }
+  }
+
+  function route() {
+    const r = currentRoute();
+    if (r.name === 'detail' || r.name === 'proofPage') {
+      if (Number.isNaN(r.id)) state.detail = { id: null, status: 'missing' };
+      else openDetail(r.id);
+    } else {
+      state.detail = null;
+      if (!PROOF_MODE) document.title = 'Freelance Flow — milestones stamped on BOT Chain';
+    }
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function renderChrome() {
+    for (const slot of document.querySelectorAll('[data-icon]')) slot.replaceWith(icon(slot.dataset.icon, Number(slot.dataset.size)));
+    document.body.classList.toggle('proof', PROOF_MODE);
+    $('wordmark').href = url();
+    $('side-mark').href = url();
+    $('foot-home').href = url();
+
+    // The footer always points at the mainnet contract.
+    const mainnet = CONFIG.networks.mainnet;
+    $('foot-explorer').href = mainnet.contract ? `${mainnet.explorer}/address/${mainnet.contract}` : mainnet.explorer + '/';
+    $('foot-net').textContent = `(${mainnet.name}, chain ID ${mainnet.chainId})`;
+
+    const notice = PREVIEW
+      ? 'Preview mode · the contract is not deployed yet, so projects are saved in this browser only'
+      : netKey === 'testnet' ? 'Testnet · projects stamped here are for testing only'
+        : netKey === 'local' ? 'Local chain · for development only' : '';
+    $('notice').hidden = !notice;
+    $('notice').textContent = notice;
+  }
+
+  // ============================================================
+  // Boot
+  // ============================================================
+  function boot() {
+    renderChrome();
+    if (!PREVIEW) readContract = new ethers.Contract(NET.contract, ABI, new ethers.JsonRpcProvider(NET.rpc, NET.chainId, { staticNetwork: true, batchMaxCount: 1 }));
+
+    $('nav-new').addEventListener('click', openNewProject);
+    $('new-form').addEventListener('submit', submitNewProject);
+    $('new-form').addEventListener('input', () => formError(''));
+    $('np-add').addEventListener('click', () => {
+      const row = milestoneInputRow();
+      $('np-rows').append(row);
+      syncMilestoneRows();
+      row.querySelector('input').focus();
+    });
+    for (const id of ['np-close', 'np-cancel']) $(id).addEventListener('click', () => { if (!creating) dialog.close(); });
+    dialog.addEventListener('cancel', (e) => { if (creating) e.preventDefault(); });
+    dialog.addEventListener('click', (e) => { if (e.target === dialog && !creating) dialog.close(); });
+    $('toast-close').addEventListener('click', hideToast);
+    window.addEventListener('hashchange', route);
+    window.addEventListener('ethereum#initialized', initWallet, { once: true });
+
+    route();
+    initWallet();
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
