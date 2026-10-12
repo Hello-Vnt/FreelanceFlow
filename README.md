@@ -8,7 +8,7 @@ A freelancer's project board where every milestone you complete is stamped on BO
 
 | | |
 |---|---|
-| Live site | https://hello-vnt.github.io/FreelanceFlow/ |
+| Live site | https://freelanceflow.online/ |
 | Contract (BOT Chain mainnet, chain ID 677) | [`0xcf3b9ce7959aD5926438978CAC1447655e0d8C17`](https://scan.botchain.ai/address/0xcf3b9ce7959aD5926438978CAC1447655e0d8C17) |
 | Contract (testnet, chain ID 968) | _not deployed yet_ |
 
