@@ -373,14 +373,35 @@
   .foot-name { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-size: 16px; font-weight: 700; letter-spacing: -.01em; text-decoration: none; }
   .foot .mark, body.landing .foot .mark { width: 32px; height: 32px; border-radius: 10px; background: var(--accent); }
   .foot-brand p { margin-top: 8px; font-size: 13.5px; }
-  .foot-chain { display: flex; align-items: center; gap: 22px; }
-  .foot-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .foot-logo { display: block; padding: 6px; border: 1px solid var(--border); border-radius: 24px; background: #fff; transition: transform .2s, box-shadow .2s; }
-  .foot-logo:hover { transform: translateY(-3px) rotate(-3deg); box-shadow: 0 10px 22px rgba(91, 76, 219, .22); }
-  .foot-logo img { display: block; width: 64px; height: 64px; border-radius: 18px; }
-  .foot-built { color: var(--text); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-  .foot-explorer { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border: 1px solid var(--accent); border-radius: 999px; background: #fff; color: var(--accent); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s, color .15s; }
-  .foot-explorer:hover { background: var(--accent); color: #fff; }
+  .foot-chain { display: flex; align-items: center; gap: 26px; }
+  .foot-col { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .seal { position: relative; display: grid; place-items: center; flex: none; width: 96px; height: 96px; border-radius: 50%; background: #fff; transition: transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+  .seal::before { content: ''; position: absolute; inset: -7px; border: 2px dashed var(--accent); border-radius: 50%; opacity: .5; animation: spin 26s linear infinite; }
+  .seal:hover { transform: rotate(-8deg) scale(1.06); }
+  .seal:hover::before { opacity: 1; animation-duration: 5s; }
+  .seal img { display: block; width: 66px; height: 66px; }
+  .foot-built { color: var(--text); font-size: 14.5px; font-weight: 600; }
+  .foot-explorer { display: inline-flex; align-items: center; gap: 9px; padding: 8px 14px 8px 16px; border-radius: 12px; background: var(--accent); color: #fff; font-size: 13.5px; font-weight: 600; text-decoration: none; transition: background .15s, transform .15s; }
+  .foot-explorer:hover { background: var(--accent-dark); transform: translateY(-2px); }
+  .foot-explorer code { padding: 2px 8px; border-radius: 7px; background: rgba(255, 255, 255, .2); font: 500 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .foot-explorer code:empty { display: none; }
+
+  /* ---------- BOT Chain chip in the top bar ---------- */
+  .chain { display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 4px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .chain a { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 3px; border-radius: 999px; color: var(--text); text-decoration: none; transition: background .15s, color .15s; }
+  .chain a:hover { background: var(--accent-soft); color: var(--accent); }
+  .chain .chain-scan { padding-left: 10px; color: var(--muted); font: 500 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .chain-logo { flex: none; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 50%; overflow: hidden; background: #fff; }
+  .chain-logo img { display: block; max-width: none; width: 40px; height: 40px; margin: -4px 0 0 -8px; }
+  .chain .sep { width: 1px; height: 18px; background: var(--border); }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s ease-out infinite; }
+  @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); } to { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); } }
+  body.landing .chain { border-color: transparent; background: rgba(255, 255, 255, .16); }
+  body.landing .chain a, body.landing .chain a:hover { color: #fff; }
+  body.landing .chain a:hover { background: rgba(255, 255, 255, .2); }
+  body.landing .chain .sep { background: rgba(255, 255, 255, .35); }
+  body.landing .chain-logo { border-color: transparent; }
+  body.landing .pulse { background: #86EFAC; }
 
   /* ---------- mobile: sidebar becomes a bottom tab bar ---------- */
   @media (max-width: 720px) {
@@ -408,8 +429,13 @@
     body.proof .toast { bottom: 16px; }
     .foot { padding: 0 16px 20px; }
     .foot-in { flex-direction: column; padding: 26px 20px; text-align: center; }
-    .foot-chain { flex-direction: column; gap: 18px; }
+    .foot-chain { flex-direction: column; gap: 22px; }
+    .foot-col { align-items: center; }
+    .chain .txt, .chain .pulse { display: none; }
+    .chain a { padding: 0 3px; }
+    .chain .chain-scan { justify-content: center; width: 32px; padding: 0; }
   }
+  @media (max-width: 520px) { body:not(.proof) .wm-text { display: none; } }
   @media (prefers-reduced-motion: reduce) { * { animation-duration: 0s !important; transition-duration: 0s !important; } }
 </style>
 </head>
@@ -425,7 +451,12 @@
 
 <div class="page">
   <header class="top">
-    <a class="wordmark" id="wordmark" href="./"><span class="mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></span>Freelance Flow</a>
+    <a class="wordmark" id="wordmark" href="./"><span class="mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></span><span class="wm-text">Freelance Flow</span></a>
+    <div class="chain">
+      <a class="chain-home" href="https://botchain.ai" target="_blank" rel="noopener" title="Visit BOT Chain"><span class="chain-logo"><img src="images/bot-chain.png" alt="" width="40" height="40"></span><i class="pulse"></i><span class="txt">Stamped on BOT Chain</span></a>
+      <span class="sep"></span>
+      <a class="chain-scan" id="nav-explorer" href="https://scan.botchain.ai/" target="_blank" rel="noopener" title="Check the contract on the BOT Chain explorer" aria-label="Check the contract on the BOT Chain explorer"><span class="txt" id="nav-contract"></span><span data-icon="external" data-size="15"></span></a>
+    </div>
     <div id="wallet-slot"></div>
     <a class="btn primary" id="launch" href="#/projects">Launch app</a>
   </header>
@@ -436,16 +467,14 @@
     <div class="foot-in">
       <div class="foot-brand">
         <a class="foot-name" id="foot-home" href="./"><span class="mark"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="8" r="3.6" fill="#fff"/><rect x="14" y="9" width="4" height="5" fill="#fff"/><rect x="7" y="11.5" width="18" height="13" rx="6" fill="#fff"/><rect x="4.5" y="22.5" width="23" height="5" rx="2.5" fill="#FFD166"/><circle cx="12.6" cy="17" r="1.6" fill="#111827"/><circle cx="19.4" cy="17" r="1.6" fill="#111827"/><path d="M13.6 19.8q2.4 1.8 4.8 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/></svg></span>Freelance Flow</a>
-        <p>Every milestone you finish, stamped on BOT Chain.</p>
+        <p>Made for freelancers who finish things. Stampy keeps the proof.</p>
       </div>
       <div class="foot-chain">
+        <a class="seal" href="https://botchain.ai" target="_blank" rel="noopener" title="Visit BOT Chain" aria-label="BOT Chain"><img src="images/bot-chain.png" alt="BOT Chain" width="66" height="66" loading="lazy"></a>
         <div class="foot-col">
-          <a class="foot-logo" href="https://botchain.ai" target="_blank" rel="noopener" aria-label="BOT Chain"><img src="images/bot-chain.png" alt="BOT Chain" width="64" height="64" loading="lazy"></a>
-          <span class="foot-built">Built on</span>
-        </div>
-        <div class="foot-col">
-          <a class="foot-explorer" id="foot-explorer" href="https://scan.botchain.ai/" target="_blank" rel="noopener">View on explorer<span data-icon="external" data-size="15"></span></a>
-          <span id="foot-net">(BOT Chain, chain ID 677)</span>
+          <span class="foot-built">Every stamp here lives on BOT Chain.</span>
+          <a class="foot-explorer" id="foot-explorer" href="https://scan.botchain.ai/" target="_blank" rel="noopener" title="Open the contract on the BOT Chain explorer">Check the receipts<code id="foot-contract"></code><span data-icon="external" data-size="15"></span></a>
+          <span id="foot-net">BOT Chain mainnet · chain ID 677</span>
         </div>
       </div>
     </div>
@@ -1571,10 +1600,14 @@
     $('side-mark').href = url();
     $('foot-home').href = url();
 
-    // The footer always points at the mainnet contract.
+    // The footer and the top-bar chip always point at the mainnet contract.
     const mainnet = CONFIG.networks.mainnet;
-    $('foot-explorer').href = mainnet.contract ? `${mainnet.explorer}/address/${mainnet.contract}` : mainnet.explorer + '/';
-    $('foot-net').textContent = `(${mainnet.name}, chain ID ${mainnet.chainId})`;
+    const explorer = mainnet.contract ? `${mainnet.explorer}/address/${mainnet.contract}` : mainnet.explorer + '/';
+    $('foot-explorer').href = explorer;
+    $('nav-explorer').href = explorer;
+    $('foot-contract').textContent = mainnet.contract ? short(mainnet.contract) : '';
+    $('nav-contract').textContent = mainnet.contract ? short(mainnet.contract) : 'Explorer';
+    $('foot-net').textContent = `${mainnet.name} mainnet · chain ID ${mainnet.chainId}`;
 
     const notice = PREVIEW
       ? 'Preview mode · the contract is not deployed yet, so projects are saved in this browser only'
